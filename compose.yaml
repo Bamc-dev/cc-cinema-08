@@ -1,0 +1,24 @@
+services:
+  mariadb:
+    image: mariadb:10.11
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: cinema
+      MYSQL_USER: cinema
+      MYSQL_PASSWORD: cinema
+    volumes:
+      - ./data/mariadb:/var/lib/mysql
+    
+  phpmyadmin:
+    image: phpmyadmin:latest
+    ports:
+      - 8080:80
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+    depends_on:
+      - mariadb

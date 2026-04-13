@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "cinema", indexes = {
-    @Index(name = "idx_cinema_name", columnList = "name")
+        @Index(name = "idx_cinema_name", columnList = "name")
 })
 public class Cinema extends BaseEntity {
 
@@ -25,24 +25,31 @@ public class Cinema extends BaseEntity {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     public String getCity() {
         return city;
     }
+
     public void setCity(String city) {
         this.city = city;
     }
+
     public String getStreet() {
         return street;
     }
+
     public void setStreet(String street) {
         this.street = street;
     }
+
     public String getNumber() {
         return number;
     }
+
     public void setNumber(String number) {
         this.number = number;
     }
@@ -50,6 +57,7 @@ public class Cinema extends BaseEntity {
     public Set<Room> getRooms() {
         return rooms;
     }
+
     public void setRooms(Set<Room> rooms) {
         this.rooms = new HashSet<>(rooms);
     }

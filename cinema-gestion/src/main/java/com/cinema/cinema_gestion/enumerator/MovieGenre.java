@@ -1,4 +1,4 @@
-package com.cinema.cinema_gestion.entity.enumerator;
+package com.cinema.cinema_gestion.enumerator;
 
 public enum MovieGenre {
     ACTION,

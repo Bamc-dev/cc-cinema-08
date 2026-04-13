@@ -2,12 +2,13 @@ package com.cinema.cinema_gestion.entity;
 
 import java.time.LocalDate;
 
-import com.cinema.cinema_gestion.entity.enumerator.MovieGenre;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.CascadeType;
 import java.util.Set;
+
+import com.cinema.cinema_gestion.enumerator.MovieGenre;
+
 import java.util.HashSet;
 
 @Entity

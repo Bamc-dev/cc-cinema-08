@@ -10,6 +10,10 @@ public class MovieShowDTOCRUD extends BaseDTO {
     private Long roomId;
     private Set<Long> scheduleIds;
 
+    public MovieShowDTOCRUD() {
+        super(null);
+    }
+
     public MovieShowDTOCRUD(Long id, Double price, Long movieId, Long roomId, Set<Long> scheduleIds) {
         super(id);
         this.price = price;

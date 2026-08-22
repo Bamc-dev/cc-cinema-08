@@ -11,6 +11,10 @@ public class MovieDTOCRUD extends BaseDTO {
     private MovieGenre genre;
     private Set<Long> movieShowIds;
 
+    public MovieDTOCRUD() {
+        super(null);
+    }
+
     public MovieDTOCRUD(Long id, String title, LocalDate releaseDate, MovieGenre genre) {
         super(id);
         this.title = title;

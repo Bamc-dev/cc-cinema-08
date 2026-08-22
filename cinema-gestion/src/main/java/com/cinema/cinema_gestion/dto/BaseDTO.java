@@ -7,6 +7,10 @@ public abstract class BaseDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    protected BaseDTO() {
+        this(null);
+    }
+
     protected BaseDTO(Long id) {
         this.id = id;
         this.createdAt = LocalDateTime.now();

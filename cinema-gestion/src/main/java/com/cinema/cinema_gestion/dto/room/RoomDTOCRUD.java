@@ -7,6 +7,10 @@ import java.util.Set;
 
 public class RoomDTOCRUD extends BaseDTO {
 
+    public RoomDTOCRUD() {
+        super(null);
+    }
+
     public RoomDTOCRUD(Long id, Integer capacity, LocalDate constructionDate, Long cinemaId) {
         super(id);
         this.capacity = capacity;

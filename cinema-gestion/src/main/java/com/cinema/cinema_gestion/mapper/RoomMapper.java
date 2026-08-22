@@ -15,6 +15,7 @@ public interface RoomMapper extends GenericMapper<Room, RoomDTOCRUD, RoomDTOView
 
     @Override
     @Mapping(target = "cinemaId", expression = "java(entity.getCinema().getId())")
+    @Mapping(target = "movieShowIds", expression = "java(entitiesToIds(entity.getMovieShows()))")
     RoomDTOCRUD toDTO(Room entity);
 
     @Override

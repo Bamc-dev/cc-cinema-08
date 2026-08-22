@@ -1,9 +1,6 @@
 package com.cinema.cinema_gestion.dto;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.data.domain.Page;
 
 public class PageDTO<T> {
     private List<T> content;

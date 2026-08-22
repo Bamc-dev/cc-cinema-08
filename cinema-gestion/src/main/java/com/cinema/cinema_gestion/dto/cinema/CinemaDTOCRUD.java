@@ -12,6 +12,10 @@ public class CinemaDTOCRUD extends BaseDTO {
 
     private Set<Long> roomIds;
 
+    public CinemaDTOCRUD() {
+        super(null);
+    }
+
     public CinemaDTOCRUD(Long id, String name, String city, String street, String number, Set<Long> roomIds) {
         super(id);
         this.name = name;

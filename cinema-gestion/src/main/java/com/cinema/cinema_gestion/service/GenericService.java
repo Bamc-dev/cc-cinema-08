@@ -25,9 +25,25 @@ public abstract class GenericService<E extends BaseEntity, D extends BaseDTO, V 
         Page<E> pageEntity = repository.findAll(PageRequest.of(page, size));
         return new PageDTO<>(pageEntity.getContent().stream().map(mapper::toView).collect(Collectors.toList()), pageEntity.getTotalElements(), pageEntity.getTotalPages(), pageEntity.getSize(), pageEntity.getSort().isSorted());
     }
+
+    public PageDTO<V> findAll(String search, int page, int size) {
+        if (search == null || search.isBlank()) {
+            return findAll(page, size);
+        }
+        return findAll(buildSearchSpecification(search.trim()), page, size);
+    }
+
     public PageDTO<V> findAll(Specification<E> specification, int page, int size) {
         Page<E> pageEntity = repository.findAll(specification, PageRequest.of(page, size));
         return new PageDTO<>(pageEntity.getContent().stream().map(mapper::toView).collect(Collectors.toList()), pageEntity.getTotalElements(), pageEntity.getTotalPages(), pageEntity.getSize(), pageEntity.getSort().isSorted());
+    }
+
+    protected Specification<E> buildSearchSpecification(String search) {
+        return (root, query, cb) -> cb.conjunction();
+    }
+
+    protected static String likePattern(String search) {
+        return "%" + search.toLowerCase() + "%";
     }
 
     public V findById(Long id) {

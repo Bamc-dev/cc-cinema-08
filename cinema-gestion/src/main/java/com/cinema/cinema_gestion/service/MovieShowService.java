@@ -1,5 +1,6 @@
 package com.cinema.cinema_gestion.service;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.cinema.cinema_gestion.dto.movieshow.MovieShowDTOCRUD;
@@ -8,9 +9,31 @@ import com.cinema.cinema_gestion.entity.MovieShow;
 import com.cinema.cinema_gestion.mapper.MovieShowMapper;
 import com.cinema.cinema_gestion.repository.MovieShowRepository;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class MovieShowService extends GenericService<MovieShow, MovieShowDTOCRUD, MovieShowDTOView, MovieShowMapper, MovieShowRepository> {
     public MovieShowService(MovieShowRepository repository, MovieShowMapper mapper) {
         super(repository, mapper);
+    }
+
+    @Override
+    protected Specification<MovieShow> buildSearchSpecification(String search) {
+        String pattern = likePattern(search);
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            Join<Object, Object> movie = root.join("movie");
+            predicates.add(cb.like(cb.lower(movie.get("title")), pattern));
+            try {
+                Double price = Double.valueOf(search);
+                predicates.add(cb.equal(root.get("price"), price));
+            } catch (NumberFormatException ignored) {
+                // not a numeric price
+            }
+            return cb.or(predicates.toArray(Predicate[]::new));
+        };
     }
 }

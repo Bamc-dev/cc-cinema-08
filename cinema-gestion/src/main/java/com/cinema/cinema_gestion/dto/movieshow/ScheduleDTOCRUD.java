@@ -8,6 +8,10 @@ public class ScheduleDTOCRUD extends BaseDTO {
     private LocalDateTime endTime;
     private Long movieShowId;
 
+    public ScheduleDTOCRUD() {
+        super(null);
+    }
+
     public ScheduleDTOCRUD(Long id, LocalDateTime startTime, LocalDateTime endTime, Long movieShowId) {
         super(id);
         this.startTime = startTime;

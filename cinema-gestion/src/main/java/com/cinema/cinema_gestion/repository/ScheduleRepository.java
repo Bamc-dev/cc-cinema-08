@@ -27,16 +27,52 @@ public interface ScheduleRepository extends GenericRepository<Schedule> {
             SELECT s FROM Schedule s
             JOIN s.movieShow ms
             JOIN ms.movie m
+            WHERE m.id = :movieId
+            ORDER BY s.startTime
+            """)
+    List<Schedule> findShowtimesByMovieId(@Param("movieId") Long movieId);
+
+    @Query("""
+            SELECT s FROM Schedule s
+            JOIN s.movieShow ms
+            JOIN ms.movie m
+            WHERE m.id = :movieId
+              AND s.startTime >= :startOfDay
+              AND s.startTime < :endOfDay
+            ORDER BY s.startTime
+            """)
+    List<Schedule> findShowtimesByMovieIdAndDate(@Param("movieId") Long movieId,
+            @Param("startOfDay") LocalDateTime startOfDay,
+            @Param("endOfDay") LocalDateTime endOfDay);
+
+    @Query("""
+            SELECT s FROM Schedule s
+            JOIN s.movieShow ms
+            JOIN ms.movie m
             JOIN ms.room r
             JOIN r.cinema c
             WHERE m.id = :movieId
-              AND (:startOfDay IS NULL OR s.startTime >= :startOfDay)
-              AND (:endOfDay IS NULL OR s.startTime < :endOfDay)
-              AND (:q IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', :q, '%'))
+              AND (LOWER(c.name) LIKE LOWER(CONCAT('%', :q, '%'))
                    OR LOWER(c.city) LIKE LOWER(CONCAT('%', :q, '%')))
             ORDER BY s.startTime
             """)
-    List<Schedule> findShowtimesByMovieId(@Param("movieId") Long movieId,
+    List<Schedule> findShowtimesByMovieIdAndCinema(@Param("movieId") Long movieId,
+            @Param("q") String q);
+
+    @Query("""
+            SELECT s FROM Schedule s
+            JOIN s.movieShow ms
+            JOIN ms.movie m
+            JOIN ms.room r
+            JOIN r.cinema c
+            WHERE m.id = :movieId
+              AND s.startTime >= :startOfDay
+              AND s.startTime < :endOfDay
+              AND (LOWER(c.name) LIKE LOWER(CONCAT('%', :q, '%'))
+                   OR LOWER(c.city) LIKE LOWER(CONCAT('%', :q, '%')))
+            ORDER BY s.startTime
+            """)
+    List<Schedule> findShowtimesByMovieIdAndDateAndCinema(@Param("movieId") Long movieId,
             @Param("startOfDay") LocalDateTime startOfDay,
             @Param("endOfDay") LocalDateTime endOfDay,
             @Param("q") String q);

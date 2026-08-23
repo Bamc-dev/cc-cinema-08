@@ -131,7 +131,7 @@ class PublicServiceTest {
 
     @Test
     void findMovieShowtimes_mapsScheduleDetails() {
-        when(scheduleRepository.findShowtimesByMovieId(eq(1L), isNull(), isNull(), isNull()))
+        when(scheduleRepository.findShowtimesByMovieId(eq(1L)))
                 .thenReturn(List.of(schedule));
 
         List<MovieShowtimePublicView> result = publicService.findMovieShowtimes(1L, null, null);

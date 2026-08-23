@@ -21,9 +21,12 @@ import com.cinema.cinema_gestion.entity.Movie;
 import com.cinema.cinema_gestion.entity.MovieShow;
 import com.cinema.cinema_gestion.entity.Room;
 import com.cinema.cinema_gestion.entity.Schedule;
+import com.cinema.cinema_gestion.enumerator.MovieGenre;
 import com.cinema.cinema_gestion.repository.CinemaRepository;
 import com.cinema.cinema_gestion.repository.MovieRepository;
 import com.cinema.cinema_gestion.repository.ScheduleRepository;
+
+import jakarta.persistence.criteria.Predicate;
 
 @Service
 public class PublicService {
@@ -61,7 +64,17 @@ public class PublicService {
             movies = movieRepository.findAll();
         } else {
             String pattern = "%" + query.toLowerCase() + "%";
-            Specification<Movie> spec = (root, q, cb) -> cb.like(cb.lower(root.get("title")), pattern);
+            Specification<Movie> spec = (root, q, cb) -> {
+                List<Predicate> predicates = new ArrayList<>();
+                predicates.add(cb.like(cb.lower(root.get("title")), pattern));
+                try {
+                    MovieGenre genre = MovieGenre.valueOf(query.trim().toUpperCase().replace(' ', '_'));
+                    predicates.add(cb.equal(root.get("genre"), genre));
+                } catch (IllegalArgumentException ignored) {
+                    // not a valid genre enum name
+                }
+                return cb.or(predicates.toArray(Predicate[]::new));
+            };
             movies = movieRepository.findAll(spec);
         }
         return movies.stream()
@@ -98,7 +111,20 @@ public class PublicService {
         }
 
         String cinemaQuery = (query == null || query.isBlank()) ? null : query.trim();
-        List<Schedule> schedules = scheduleRepository.findShowtimesByMovieId(movieId, startOfDay, endOfDay, cinemaQuery);
+        boolean hasDate = date != null;
+        boolean hasCinemaQuery = cinemaQuery != null;
+
+        List<Schedule> schedules;
+        if (hasDate && hasCinemaQuery) {
+            schedules = scheduleRepository.findShowtimesByMovieIdAndDateAndCinema(
+                    movieId, startOfDay, endOfDay, cinemaQuery);
+        } else if (hasDate) {
+            schedules = scheduleRepository.findShowtimesByMovieIdAndDate(movieId, startOfDay, endOfDay);
+        } else if (hasCinemaQuery) {
+            schedules = scheduleRepository.findShowtimesByMovieIdAndCinema(movieId, cinemaQuery);
+        } else {
+            schedules = scheduleRepository.findShowtimesByMovieId(movieId);
+        }
 
         List<MovieShowtimePublicView> result = new ArrayList<>();
         for (Schedule schedule : schedules) {

@@ -1,7 +1,6 @@
 package com.cinema.cinema_gestion.security;
 
 import java.io.IOException;
-import java.util.Arrays;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,24 +16,29 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.AntPathMatcher;
+
+import com.cinema.cinema_gestion.config.SecurityConfig;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
     private final JwtService jwtService;
     private final CustomUserDetailsService customUserDetailsService;
-    private final String[] publicPaths;
+    @Value("${security.route.public.paths}")
+    private final String[] AUTH_PUBLIC_PATHS;
 
-    public JwtAuthenticationFilter(JwtService jwtService, CustomUserDetailsService customUserDetailsService, @Value("${security.route.public.paths}") String[] publicPaths) {
+    public JwtAuthenticationFilter(JwtService jwtService, CustomUserDetailsService customUserDetailsService, @Value("${security.route.public.paths}") String[] AUTH_PUBLIC_PATHS) {
         this.jwtService = jwtService;
         this.customUserDetailsService = customUserDetailsService;
-        this.publicPaths = publicPaths;
+        this.AUTH_PUBLIC_PATHS = AUTH_PUBLIC_PATHS;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        if (Arrays.asList(publicPaths).contains(request.getRequestURI())) {
+        if (isPublicPath(request.getRequestURI())) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -66,5 +70,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isPublicPath(String uri) {
+        for (String pattern : AUTH_PUBLIC_PATHS) {
+            if (PATH_MATCHER.match(pattern, uri)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -15,13 +15,13 @@ import com.cinema.cinema_gestion.security.JwtAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final String[] publicPaths;
+    @Value("${security.route.public.paths}")
+    private String[] AUTH_PUBLIC_PATHS;   
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-            @Value("${security.route.public.paths}") String[] publicPaths) {
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.publicPaths = publicPaths;
     }
 
     @Bean
@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(publicPaths).permitAll()
+                        .requestMatchers(AUTH_PUBLIC_PATHS).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

@@ -1,28 +1,24 @@
 services:
-  mariadb:
-    image: mariadb:10.11
+  app_db:
+    image: postgres:16-alpine
     ports:
-      - 3306:3306
+      - 5432:5432
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: cinema
-      MYSQL_USER: cinema
-      MYSQL_PASSWORD: cinema
+      POSTGRES_USER: cinema
+      POSTGRES_PASSWORD: cinema
+      POSTGRES_DB: cinema
     volumes:
-      - ./data/mariadb:/var/lib/mysql
-    
-  phpmyadmin:
-    image: phpmyadmin:latest
-    ports:
-      - 8080:80
-    environment:
-      PMA_HOST: mariadb
-      PMA_PORT: 3306
-      PMA_USER: root
-      PMA_PASSWORD: root
-    depends_on:
-      - mariadb
+      - app_db_data:/var/lib/postgresql/data
 
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "8080:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - app_db
 
   sonarqube-db:
     image: postgres:16-alpine
@@ -59,3 +55,4 @@ volumes:
   sonarqube_data:
   sonarqube_extensions:
   sonarqube_logs:
+  app_db_data:

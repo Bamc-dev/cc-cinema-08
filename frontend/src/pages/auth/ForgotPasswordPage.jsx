@@ -1,12 +1,28 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Alert, Button, Form, Input, Typography, message } from 'antd'
-import { ArrowLeftOutlined } from '@ant-design/icons'
+import { ArrowLeftOutlined, MailOutlined } from '@ant-design/icons'
 import { forgotPassword as forgotPasswordRequest } from '../../api/auth'
 import { ApiError } from '../../api/client'
 import { formatDateTime } from '../../utils/formatDate'
 
-const { Title, Paragraph } = Typography
+const { Title, Paragraph, Text } = Typography
+
+function mapForgotError(error) {
+  if (!(error instanceof ApiError)) {
+    return 'Impossible d’envoyer le lien pour le moment.'
+  }
+
+  if (error.status === 404) {
+    return 'Aucun compte n’est associé à cet email.'
+  }
+
+  if (error.status === 400) {
+    return 'Veuillez saisir une adresse email valide.'
+  }
+
+  return error.message || 'Impossible d’envoyer le lien pour le moment.'
+}
 
 function ForgotPasswordPage() {
   const [form] = Form.useForm()
@@ -18,14 +34,12 @@ function ForgotPasswordPage() {
     setResetInfo(null)
 
     try {
-      const response = await forgotPasswordRequest(values.email)
+      const response = await forgotPasswordRequest(values.email.trim())
       setResetInfo(response)
-      message.success('Demande envoyée')
+      message.success('Email envoyé')
+      form.resetFields()
     } catch (error) {
-      const errorMessage =
-        error instanceof ApiError ? error.message : 'Impossible de traiter la demande'
-
-      message.error(errorMessage)
+      message.error(mapForgotError(error))
     } finally {
       setLoading(false)
     }
@@ -41,7 +55,8 @@ function ForgotPasswordPage() {
 
       <Title level={2}>Mot de passe oublié</Title>
       <Paragraph type="secondary">
-        Saisissez votre email pour recevoir un lien de réinitialisation.
+        Indiquez l&apos;email de votre compte. Vous recevrez un lien pour choisir un nouveau mot de
+        passe.
       </Paragraph>
 
       <Form
@@ -59,7 +74,12 @@ function ForgotPasswordPage() {
             { type: 'email', message: 'Email invalide' },
           ]}
         >
-          <Input placeholder="vous@exemple.fr" size="large" />
+          <Input
+            prefix={<MailOutlined />}
+            placeholder="vous@exemple.fr"
+            size="large"
+            autoComplete="email"
+          />
         </Form.Item>
 
         <Form.Item>
@@ -73,14 +93,16 @@ function ForgotPasswordPage() {
         <Alert
           type="success"
           showIcon
-          style={{ maxWidth: 560, marginTop: 24 }}
-          message="Email envoyé"
+          style={{ maxWidth: 560, marginTop: 8 }}
+          message="Vérifiez votre boîte mail"
           description={
             <>
-              <Paragraph style={{ marginBottom: 8 }}>{resetInfo.message}</Paragraph>
+              <Paragraph style={{ marginBottom: 8 }}>
+                Un email contenant un lien de réinitialisation vient d&apos;être envoyé.
+              </Paragraph>
               {resetInfo.expiresAt && (
                 <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  Le lien expire le {formatDateTime(resetInfo.expiresAt)}.
+                  Le lien est valable jusqu&apos;au {formatDateTime(resetInfo.expiresAt)}.
                 </Paragraph>
               )}
             </>

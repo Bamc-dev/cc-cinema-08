@@ -1,11 +1,33 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { Button, Form, Input, Typography, message } from 'antd'
-import { ArrowLeftOutlined } from '@ant-design/icons'
+import { Alert, Button, Form, Input, Typography, message } from 'antd'
+import { ArrowLeftOutlined, LockOutlined } from '@ant-design/icons'
 import { resetPassword as resetPasswordRequest } from '../../api/auth'
 import { ApiError } from '../../api/client'
 
 const { Title, Paragraph } = Typography
+
+function mapResetError(error) {
+  if (!(error instanceof ApiError)) {
+    return 'Impossible de mettre à jour le mot de passe.'
+  }
+
+  const reason = (error.message || '').toLowerCase()
+
+  if (reason.includes('expired')) {
+    return 'Ce lien a expiré. Demandez un nouveau lien de réinitialisation.'
+  }
+
+  if (reason.includes('invalid') || reason.includes('token')) {
+    return 'Ce lien est invalide ou a déjà été utilisé.'
+  }
+
+  if (error.status === 400) {
+    return 'Le lien ou le nouveau mot de passe est invalide.'
+  }
+
+  return error.message || 'Impossible de mettre à jour le mot de passe.'
+}
 
 function ResetPasswordPage() {
   const [searchParams] = useSearchParams()
@@ -13,23 +35,30 @@ function ResetPasswordPage() {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
 
-  const tokenFromUrl = searchParams.get('token') ?? ''
+  const tokenFromUrl = useMemo(
+    () => (searchParams.get('token') ?? '').trim(),
+    [searchParams],
+  )
+
+  const hasToken = tokenFromUrl.length > 0
 
   const handleSubmit = async (values) => {
+    if (!hasToken) {
+      message.error('Lien de réinitialisation manquant.')
+      return
+    }
+
     setLoading(true)
 
     try {
       await resetPasswordRequest({
-        token: values.token,
+        token: tokenFromUrl,
         newPassword: values.newPassword,
       })
-      message.success('Mot de passe mis à jour')
+      message.success('Mot de passe mis à jour. Vous pouvez vous connecter.')
       navigate('/login', { replace: true })
     } catch (error) {
-      const errorMessage =
-        error instanceof ApiError ? error.message : 'Impossible de réinitialiser le mot de passe'
-
-      message.error(errorMessage)
+      message.error(mapResetError(error))
     } finally {
       setLoading(false)
     }
@@ -48,22 +77,29 @@ function ResetPasswordPage() {
         Choisissez un nouveau mot de passe pour votre compte.
       </Paragraph>
 
+      {!hasToken && (
+        <Alert
+          type="warning"
+          showIcon
+          style={{ maxWidth: 520, marginBottom: 24 }}
+          message="Lien incomplet"
+          description={
+            <>
+              Ouvrez le lien reçu par email, ou{' '}
+              <Link to="/forgot-password">demandez un nouveau lien</Link>.
+            </>
+          }
+        />
+      )}
+
       <Form
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
-        initialValues={{ token: tokenFromUrl }}
-        style={{ maxWidth: 420, marginTop: 24 }}
+        style={{ maxWidth: 420, marginTop: hasToken ? 24 : 0 }}
         requiredMark={false}
+        disabled={!hasToken}
       >
-        <Form.Item
-          label="Code reçu par email"
-          name="token"
-          rules={[{ required: true, message: 'Code requis' }]}
-        >
-          <Input placeholder="Collez le code reçu par email" size="large" />
-        </Form.Item>
-
         <Form.Item
           label="Nouveau mot de passe"
           name="newPassword"
@@ -72,7 +108,12 @@ function ResetPasswordPage() {
             { min: 8, message: 'Minimum 8 caractères' },
           ]}
         >
-          <Input.Password placeholder="Nouveau mot de passe" size="large" />
+          <Input.Password
+            prefix={<LockOutlined />}
+            placeholder="Nouveau mot de passe"
+            size="large"
+            autoComplete="new-password"
+          />
         </Form.Item>
 
         <Form.Item
@@ -92,12 +133,17 @@ function ResetPasswordPage() {
             }),
           ]}
         >
-          <Input.Password placeholder="Confirmez le mot de passe" size="large" />
+          <Input.Password
+            prefix={<LockOutlined />}
+            placeholder="Confirmez le mot de passe"
+            size="large"
+            autoComplete="new-password"
+          />
         </Form.Item>
 
         <Form.Item>
           <Button type="primary" htmlType="submit" loading={loading} size="large" block>
-            Mettre à jour le mot de passe
+            Enregistrer le mot de passe
           </Button>
         </Form.Item>
       </Form>

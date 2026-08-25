@@ -8,7 +8,7 @@ import AdminFormModal from '../../components/admin/AdminFormModal'
 import AdminPageLayout from '../../components/admin/AdminPageLayout'
 
 const COLUMNS = [
-  { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
+  { title: 'Réf.', dataIndex: 'id', key: 'id', width: 80 },
   { title: 'Nom', dataIndex: 'name', key: 'name' },
   { title: 'Ville', dataIndex: 'city', key: 'city' },
 ]
@@ -184,7 +184,7 @@ function AdminCinemasPage() {
     <>
       <Link to="/admin">
         <Button type="link" icon={<ArrowLeftOutlined />} style={{ paddingLeft: 0, marginBottom: 8 }}>
-          Retour à l&apos;administration
+          Retour à l&apos;espace de gestion
         </Button>
       </Link>
 
@@ -192,7 +192,7 @@ function AdminCinemasPage() {
         <Alert
           type="error"
           showIcon
-          message="Erreur de chargement"
+          message="Impossible d'afficher les cinémas"
           description={error}
           style={{ marginBottom: 24 }}
         />
@@ -200,8 +200,8 @@ function AdminCinemasPage() {
 
       <AdminPageLayout
         title="Cinémas"
-        description="CRUD cinémas — recherche, création, modification et suppression."
-        searchPlaceholder="Rechercher (nom, ville, rue)..."
+        description="Ajoutez et gérez vos établissements."
+        searchPlaceholder="Rechercher par nom ou ville..."
         searchValue={search}
         onSearchChange={handleSearchChange}
         createLabel="Ajouter un cinéma"

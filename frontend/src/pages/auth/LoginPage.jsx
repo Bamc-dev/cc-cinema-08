@@ -42,7 +42,7 @@ function LoginPage() {
     <>
       <Title level={2}>Connexion</Title>
       <Paragraph type="secondary">
-        Connectez-vous pour accéder à l&apos;espace administration.
+        Connectez-vous pour accéder à l&apos;espace de gestion.
       </Paragraph>
 
       <Form
@@ -60,7 +60,7 @@ function LoginPage() {
             { type: 'email', message: 'Email invalide' },
           ]}
         >
-          <Input placeholder="admin@cinema.local" size="large" />
+          <Input placeholder="vous@exemple.fr" size="large" />
         </Form.Item>
 
         <Form.Item

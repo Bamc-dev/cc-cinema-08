@@ -79,13 +79,13 @@ function MoviesPage() {
 
   return (
     <>
-      <Title level={2}>Films</Title>
+      <Title level={2}>Films à l&apos;affiche</Title>
       <Paragraph type="secondary">
-        Recherchez par titre et filtrez par genre, puis consultez les séances disponibles.
+        Recherchez un titre, filtrez par genre, puis consultez les séances.
       </Paragraph>
 
       <Search
-        placeholder="Rechercher par titre..."
+        placeholder="Titre du film..."
         allowClear
         enterButton={<SearchOutlined />}
         size="large"
@@ -105,10 +105,10 @@ function MoviesPage() {
             flexWrap: 'wrap',
           }}
         >
-          <Text strong>Genres</Text>
+          <Text strong>Filtrer par genre</Text>
           {selectedGenres.length > 0 && (
             <Button type="link" size="small" onClick={() => setSelectedGenres([])}>
-              Réinitialiser
+              Effacer les filtres
             </Button>
           )}
         </div>
@@ -139,15 +139,20 @@ function MoviesPage() {
       )}
 
       {!loading && error && (
-        <Alert type="error" message="Erreur de chargement" description={error} showIcon />
+        <Alert
+          type="error"
+          message="Impossible d'afficher les films"
+          description="Réessayez dans un instant."
+          showIcon
+        />
       )}
 
       {!loading && !error && filteredMovies.length === 0 && (
         <Empty
           description={
             hasActiveFilters
-              ? 'Aucun film ne correspond à vos critères'
-              : 'Aucun film disponible pour le moment'
+              ? 'Aucun film ne correspond à votre recherche. Modifiez les filtres ou le titre.'
+              : 'Aucun film à l’affiche pour le moment.'
           }
         />
       )}

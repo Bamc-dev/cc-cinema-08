@@ -58,7 +58,7 @@ const showtimeColumns = [
   {
     title: 'Salle',
     key: 'room',
-    render: (_, record) => `Salle #${record.roomId} (${record.roomCapacity} places)`,
+    render: (_, record) => `Salle n°${record.roomId} (${record.roomCapacity} places)`,
   },
 ]
 
@@ -152,7 +152,7 @@ function MovieShowtimesPage() {
       </div>
 
       <Paragraph type="secondary" style={{ marginBottom: 32 }}>
-        Séances disponibles — choisissez une date et filtrez par cinéma ou ville
+        Choisissez une date et, si besoin, filtrez par cinéma ou ville.
       </Paragraph>
 
       <div
@@ -173,7 +173,7 @@ function MovieShowtimesPage() {
         />
 
         <Search
-          placeholder="Filtrer par cinéma ou ville..."
+          placeholder="Cinéma ou ville..."
           allowClear
           enterButton={<SearchOutlined />}
           size="large"
@@ -190,11 +190,16 @@ function MovieShowtimesPage() {
       )}
 
       {!loading && error && (
-        <Alert type="error" message="Erreur de chargement" description={error} showIcon />
+        <Alert
+          type="error"
+          message="Impossible d'afficher les séances"
+          description="Réessayez dans un instant."
+          showIcon
+        />
       )}
 
       {!loading && !error && showtimes.length === 0 && (
-        <Empty description="Aucune séance trouvée pour ces critères" />
+        <Empty description="Aucune séance pour cette date. Essayez un autre jour ou un autre cinéma." />
       )}
 
       {!loading && !error && showtimes.length > 0 && (

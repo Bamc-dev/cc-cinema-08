@@ -35,10 +35,13 @@ function AdminTable({
         total: totalElements,
         showSizeChanger: true,
         pageSizeOptions: [5, 10, 20, 50],
-        showTotal: (total) => `${total} élément${total > 1 ? 's' : ''}`,
+        showTotal: (total) => `${total} résultat${total > 1 ? 's' : ''}`,
         onChange: (nextPage, nextPageSize) => {
           onPageChange?.(nextPage - 1, nextPageSize)
         },
+      }}
+      locale={{
+        emptyText: 'Aucun élément pour le moment',
       }}
     />
   )

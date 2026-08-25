@@ -6,7 +6,7 @@ import { forgotPassword as forgotPasswordRequest } from '../../api/auth'
 import { ApiError } from '../../api/client'
 import { formatDateTime } from '../../utils/formatDate'
 
-const { Title, Paragraph, Text } = Typography
+const { Title, Paragraph } = Typography
 
 function ForgotPasswordPage() {
   const [form] = Form.useForm()
@@ -59,7 +59,7 @@ function ForgotPasswordPage() {
             { type: 'email', message: 'Email invalide' },
           ]}
         >
-          <Input placeholder="admin@cinema.local" size="large" />
+          <Input placeholder="vous@exemple.fr" size="large" />
         </Form.Item>
 
         <Form.Item>
@@ -71,21 +71,18 @@ function ForgotPasswordPage() {
 
       {resetInfo && (
         <Alert
-          type="info"
+          type="success"
           showIcon
           style={{ maxWidth: 560, marginTop: 24 }}
-          message="Token de réinitialisation (mode dev)"
+          message="Email envoyé"
           description={
             <>
               <Paragraph style={{ marginBottom: 8 }}>{resetInfo.message}</Paragraph>
-              <Text type="secondary">
-                Expire le : {formatDateTime(resetInfo.expiresAt)}
-              </Text>
-              <Paragraph style={{ marginTop: 12, marginBottom: 0 }}>
-                <Link to={`/reset-password?token=${resetInfo.resetToken}`}>
-                  Réinitialiser mon mot de passe
-                </Link>
-              </Paragraph>
+              {resetInfo.expiresAt && (
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  Le lien expire le {formatDateTime(resetInfo.expiresAt)}.
+                </Paragraph>
+              )}
             </>
           }
         />

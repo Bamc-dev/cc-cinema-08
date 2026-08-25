@@ -51,7 +51,7 @@ const EMPTY_FORM = {
 }
 
 const COLUMNS = [
-  { title: 'ID', dataIndex: 'id', key: 'id', width: 80 },
+  { title: 'Réf.', dataIndex: 'id', key: 'id', width: 80 },
   { title: 'Titre', dataIndex: 'title', key: 'title' },
   {
     title: 'Genre',
@@ -229,7 +229,7 @@ function AdminMoviesPage() {
     <>
       <Link to="/admin">
         <Button type="link" icon={<ArrowLeftOutlined />} style={{ paddingLeft: 0, marginBottom: 8 }}>
-          Retour à l&apos;administration
+          Retour à l&apos;espace de gestion
         </Button>
       </Link>
 
@@ -237,7 +237,7 @@ function AdminMoviesPage() {
         <Alert
           type="error"
           showIcon
-          message="Erreur de chargement"
+          message="Impossible d'afficher les films"
           description={error}
           style={{ marginBottom: 24 }}
         />
@@ -245,8 +245,8 @@ function AdminMoviesPage() {
 
       <AdminPageLayout
         title="Films"
-        description="CRUD films — recherche, création, modification et suppression."
-        searchPlaceholder="Rechercher (titre, genre)..."
+        description="Gérez le catalogue des films diffusés."
+        searchPlaceholder="Rechercher par titre ou genre..."
         searchValue={search}
         onSearchChange={handleSearchChange}
         createLabel="Ajouter un film"

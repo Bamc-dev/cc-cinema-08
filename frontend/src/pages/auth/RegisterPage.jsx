@@ -49,7 +49,7 @@ function RegisterPage() {
     <>
       <Title level={2}>Inscription</Title>
       <Paragraph type="secondary">
-        Créez un compte administrateur pour gérer les cinémas, films et séances.
+        Créez un compte pour gérer vos cinémas, films et séances.
       </Paragraph>
 
       <Form
@@ -67,7 +67,7 @@ function RegisterPage() {
             { type: 'email', message: 'Email invalide' },
           ]}
         >
-          <Input placeholder="admin@cinema.local" size="large" />
+          <Input placeholder="vous@exemple.fr" size="large" />
         </Form.Item>
 
         <Form.Item

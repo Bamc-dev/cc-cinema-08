@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import {
   Alert,
   Button,
-  DatePicker,
   Form,
   InputNumber,
   Popconfirm,
@@ -11,21 +10,27 @@ import {
   message,
 } from 'antd'
 import { ArrowLeftOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons'
-import dayjs from 'dayjs'
-import { cinemaApi, roomApi } from '../../api/admin'
+import { cinemaApi, movieApi, movieShowApi, roomApi } from '../../api/admin'
 import { ApiError } from '../../api/client'
 import AdminFormModal from '../../components/admin/AdminFormModal'
 import AdminPageLayout from '../../components/admin/AdminPageLayout'
 
 const EMPTY_FORM = {
-  capacity: null,
-  constructionDate: null,
-  cinemaId: null,
+  price: null,
+  movieId: null,
+  roomId: null,
 }
 
-function AdminRoomsPage() {
+function formatPrice(price) {
+  if (price == null) return '—'
+  return `${Number(price).toFixed(2)} €`
+}
+
+function AdminMovieShowsPage() {
   const [rows, setRows] = useState([])
-  const [cinemas, setCinemas] = useState([])
+  const [movies, setMovies] = useState([])
+  const [rooms, setRooms] = useState([])
+  const [cinemaNames, setCinemaNames] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [page, setPage] = useState(0)
@@ -36,58 +41,101 @@ function AdminRoomsPage() {
   const [editingRow, setEditingRow] = useState(null)
   const [saving, setSaving] = useState(false)
 
-  const cinemaNames = useMemo(
-    () => Object.fromEntries(cinemas.map((cinema) => [cinema.id, cinema.name])),
-    [cinemas],
+  const movieTitles = useMemo(
+    () => Object.fromEntries(movies.map((movie) => [movie.id, movie.title])),
+    [movies],
   )
 
-  const cinemaOptions = useMemo(
+  const roomLabels = useMemo(
     () =>
-      cinemas.map((cinema) => ({
-        value: cinema.id,
-        label: `${cinema.name} (${cinema.city})`,
+      Object.fromEntries(
+        rooms.map((room) => {
+          const cinema = cinemaNames[room.cinemaId] ?? `Cinéma n°${room.cinemaId}`
+          return [room.id, `${cinema} — ${room.capacity} places`]
+        }),
+      ),
+    [rooms, cinemaNames],
+  )
+
+  const movieOptions = useMemo(
+    () => movies.map((movie) => ({ value: movie.id, label: movie.title })),
+    [movies],
+  )
+
+  const roomOptions = useMemo(
+    () =>
+      rooms.map((room) => ({
+        value: room.id,
+        label: roomLabels[room.id] ?? `Salle n°${room.id}`,
       })),
-    [cinemas],
+    [rooms, roomLabels],
   )
 
   useEffect(() => {
-    async function loadCinemas() {
+    async function loadLookups() {
       try {
-        const data = await cinemaApi.list({ page: 0, size: 100 })
-        setCinemas(data.content ?? [])
+        const [moviesData, roomsData, cinemasData] = await Promise.all([
+          movieApi.list({ page: 0, size: 100 }),
+          roomApi.list({ page: 0, size: 100 }),
+          cinemaApi.list({ page: 0, size: 100 }),
+        ])
+
+        setMovies(moviesData.content ?? [])
+        setRooms(roomsData.content ?? [])
+        setCinemaNames(
+          Object.fromEntries(
+            (cinemasData.content ?? []).map((cinema) => [cinema.id, cinema.name]),
+          ),
+        )
       } catch {
-        setCinemas([])
+        setMovies([])
+        setRooms([])
+        setCinemaNames({})
       }
     }
 
-    loadCinemas()
+    loadLookups()
   }, [])
 
   const columns = useMemo(
     () => [
       { title: 'Réf.', dataIndex: 'id', key: 'id', width: 80 },
       {
-        title: 'Capacité',
-        dataIndex: 'capacity',
-        key: 'capacity',
-        render: (value) => `${value} places`,
+        title: 'Film',
+        dataIndex: 'movieId',
+        key: 'movieId',
+        render: (movieId) => movieTitles[movieId] ?? `Film n°${movieId}`,
       },
       {
-        title: 'Cinéma',
-        dataIndex: 'cinemaId',
-        key: 'cinemaId',
-        render: (cinemaId) => cinemaNames[cinemaId] ?? `Cinéma n°${cinemaId}`,
+        title: 'Salle',
+        dataIndex: 'roomId',
+        key: 'roomId',
+        render: (roomId) => roomLabels[roomId] ?? `Salle n°${roomId}`,
+      },
+      {
+        title: 'Prix',
+        dataIndex: 'price',
+        key: 'price',
+        width: 120,
+        render: formatPrice,
+      },
+      {
+        title: 'Créneaux',
+        dataIndex: 'scheduleIds',
+        key: 'scheduleIds',
+        width: 120,
+        render: (ids) => (ids?.length ? ids.length : 0),
       },
     ],
-    [cinemaNames],
+    [movieTitles, roomLabels],
   )
 
-  const loadRooms = useCallback(async () => {
+  const loadMovieShows = useCallback(async () => {
     setLoading(true)
     setError(null)
 
     try {
-      const data = await roomApi.list({
+      const data = await movieShowApi.list({
         page,
         size: pageSize,
         search: search || undefined,
@@ -97,7 +145,7 @@ function AdminRoomsPage() {
       setTotalElements(data.totalElements ?? 0)
     } catch (err) {
       const errorMessage =
-        err instanceof ApiError ? err.message : 'Impossible de charger les salles'
+        err instanceof ApiError ? err.message : 'Impossible de charger les séances'
       setError(errorMessage)
       setRows([])
       setTotalElements(0)
@@ -107,8 +155,8 @@ function AdminRoomsPage() {
   }, [page, pageSize, search])
 
   useEffect(() => {
-    loadRooms()
-  }, [loadRooms])
+    loadMovieShows()
+  }, [loadMovieShows])
 
   const handlePageChange = (nextPage, nextPageSize) => {
     setPage(nextPage)
@@ -140,28 +188,28 @@ function AdminRoomsPage() {
 
     try {
       const payload = {
-        capacity: values.capacity,
-        constructionDate: values.constructionDate.format('YYYY-MM-DD'),
-        cinemaId: values.cinemaId,
-        movieShowIds: [],
+        price: values.price,
+        movieId: values.movieId,
+        roomId: values.roomId,
+        scheduleIds: editingRow?.scheduleIds ?? [],
       }
 
       if (editingRow) {
-        await roomApi.update(editingRow.id, {
+        await movieShowApi.update(editingRow.id, {
           id: editingRow.id,
           ...payload,
         })
-        message.success('Salle mise à jour')
+        message.success('Séance mise à jour')
       } else {
-        await roomApi.create(payload)
-        message.success('Salle créée')
+        await movieShowApi.create(payload)
+        message.success('Séance créée')
       }
 
       closeModal()
-      await loadRooms()
+      await loadMovieShows()
     } catch (err) {
       const errorMessage =
-        err instanceof ApiError ? err.message : 'Impossible d\'enregistrer la salle'
+        err instanceof ApiError ? err.message : "Impossible d'enregistrer la séance"
       message.error(errorMessage)
     } finally {
       setSaving(false)
@@ -170,33 +218,33 @@ function AdminRoomsPage() {
 
   const handleDelete = useCallback(
     async (record) => {
-      const label = `${record.capacity} places — ${cinemaNames[record.cinemaId] ?? `Cinéma n°${record.cinemaId}`}`
+      const label = movieTitles[record.movieId] ?? `Séance n°${record.id}`
 
       try {
-        await roomApi.delete(record.id)
+        await movieShowApi.delete(record.id)
         message.success(`« ${label} » supprimée`)
 
         if (rows.length === 1 && page > 0) {
           setPage((current) => current - 1)
         } else {
-          await loadRooms()
+          await loadMovieShows()
         }
       } catch (err) {
         const errorMessage =
-          err instanceof ApiError ? err.message : 'Impossible de supprimer la salle'
+          err instanceof ApiError ? err.message : 'Impossible de supprimer la séance'
         message.error(errorMessage)
       }
     },
-    [cinemaNames, loadRooms, page, rows.length],
+    [loadMovieShows, movieTitles, page, rows.length],
   )
 
   const formInitialValues = useMemo(
     () =>
       editingRow
         ? {
-            capacity: editingRow.capacity ?? null,
-            cinemaId: editingRow.cinemaId ?? null,
-            constructionDate: null,
+            price: editingRow.price ?? null,
+            movieId: editingRow.movieId ?? null,
+            roomId: editingRow.roomId ?? null,
           }
         : EMPTY_FORM,
     [editingRow],
@@ -213,8 +261,8 @@ function AdminRoomsPage() {
             Modifier
           </Button>
           <Popconfirm
-            title="Supprimer cette salle ?"
-            description="Cette action est définitive."
+            title="Supprimer cette séance ?"
+            description="Cette séance et ses créneaux ne pourront plus être utilisés."
             okText="Supprimer"
             cancelText="Annuler"
             okButtonProps={{ danger: true }}
@@ -242,19 +290,19 @@ function AdminRoomsPage() {
         <Alert
           type="error"
           showIcon
-          message="Impossible d'afficher les salles"
+          message="Impossible d'afficher les séances"
           description={error}
           style={{ marginBottom: 24 }}
         />
       )}
 
       <AdminPageLayout
-        title="Salles"
-        description="Gérez les salles de projection et leur capacité."
-        searchPlaceholder="Rechercher par capacité ou cinéma..."
+        title="Séances"
+        description="Associez un film à une salle et définissez le prix. Les horaires se planifient ensuite."
+        searchPlaceholder="Rechercher par film ou prix..."
         searchValue={search}
         onSearchChange={handleSearchChange}
-        createLabel="Ajouter une salle"
+        createLabel="Ajouter une séance"
         onCreate={openCreate}
         columns={columns}
         dataSource={rows}
@@ -268,7 +316,7 @@ function AdminRoomsPage() {
 
       <AdminFormModal
         open={modalOpen}
-        title={editingRow ? 'Modifier la salle' : 'Ajouter une salle'}
+        title={editingRow ? 'Modifier la séance' : 'Ajouter une séance'}
         initialValues={formInitialValues}
         loading={saving}
         onCancel={closeModal}
@@ -276,38 +324,45 @@ function AdminRoomsPage() {
         okText={editingRow ? 'Mettre à jour' : 'Créer'}
       >
         <Form.Item
-          label="Capacité"
-          name="capacity"
-          rules={[{ required: true, message: 'Capacité requise' }]}
+          label="Film"
+          name="movieId"
+          rules={[{ required: true, message: 'Film requis' }]}
         >
-          <InputNumber min={1} placeholder="350" size="large" style={{ width: '100%' }} />
-        </Form.Item>
-
-        <Form.Item
-          label="Date de construction"
-          name="constructionDate"
-          rules={[{ required: true, message: 'Date requise' }]}
-        >
-          <DatePicker
-            format="DD/MM/YYYY"
-            placeholder="15/03/1998"
+          <Select
+            showSearch
+            placeholder="Choisir un film"
             size="large"
-            style={{ width: '100%' }}
-            disabledDate={(current) => current && current > dayjs().endOf('day')}
+            options={movieOptions}
+            optionFilterProp="label"
           />
         </Form.Item>
 
         <Form.Item
-          label="Cinéma"
-          name="cinemaId"
-          rules={[{ required: true, message: 'Cinéma requis' }]}
+          label="Salle"
+          name="roomId"
+          rules={[{ required: true, message: 'Salle requise' }]}
         >
           <Select
             showSearch
-            placeholder="Choisir un cinéma"
+            placeholder="Choisir une salle"
             size="large"
-            options={cinemaOptions}
+            options={roomOptions}
             optionFilterProp="label"
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="Prix (€)"
+          name="price"
+          rules={[{ required: true, message: 'Prix requis' }]}
+        >
+          <InputNumber
+            min={0}
+            step={0.5}
+            precision={2}
+            placeholder="12.50"
+            size="large"
+            style={{ width: '100%' }}
           />
         </Form.Item>
       </AdminFormModal>
@@ -315,4 +370,4 @@ function AdminRoomsPage() {
   )
 }
 
-export default AdminRoomsPage
+export default AdminMovieShowsPage

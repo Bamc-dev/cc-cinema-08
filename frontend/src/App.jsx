@@ -7,7 +7,9 @@ import AppLayout from './components/AppLayout'
 import AdminHomePage from './pages/admin/AdminHomePage'
 import AdminCinemasPage from './pages/admin/AdminCinemasPage'
 import AdminMoviesPage from './pages/admin/AdminMoviesPage'
+import AdminMovieShowsPage from './pages/admin/AdminMovieShowsPage'
 import AdminRoomsPage from './pages/admin/AdminRoomsPage'
+import AdminSchedulesPage from './pages/admin/AdminSchedulesPage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
@@ -41,6 +43,8 @@ function App() {
                 <Route path="/admin/cinemas" element={<AdminCinemasPage />} />
                 <Route path="/admin/rooms" element={<AdminRoomsPage />} />
                 <Route path="/admin/movies" element={<AdminMoviesPage />} />
+                <Route path="/admin/movie-shows" element={<AdminMovieShowsPage />} />
+                <Route path="/admin/schedules" element={<AdminSchedulesPage />} />
               </Route>
             </Route>
             </Routes>

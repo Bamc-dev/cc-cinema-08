@@ -57,11 +57,11 @@ function ResetPasswordPage() {
         requiredMark={false}
       >
         <Form.Item
-          label="Token de réinitialisation"
+          label="Code reçu par email"
           name="token"
-          rules={[{ required: true, message: 'Token requis' }]}
+          rules={[{ required: true, message: 'Code requis' }]}
         >
-          <Input placeholder="Token reçu par email" size="large" />
+          <Input placeholder="Collez le code reçu par email" size="large" />
         </Form.Item>
 
         <Form.Item

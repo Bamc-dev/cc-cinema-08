@@ -59,13 +59,13 @@ function CinemasPage() {
 
   return (
     <>
-      <Title level={2}>Cinémas</Title>
+      <Title level={2}>Nos cinémas</Title>
       <Paragraph type="secondary">
-        Recherchez un cinéma par nom ou ville, puis consultez sa programmation du jour.
+        Trouvez un cinéma par nom ou ville, puis consultez la programmation du jour.
       </Paragraph>
 
       <Search
-        placeholder="Rechercher par nom ou ville..."
+        placeholder="Nom du cinéma ou ville..."
         allowClear
         enterButton={<SearchOutlined />}
         size="large"
@@ -81,15 +81,20 @@ function CinemasPage() {
       )}
 
       {!loading && error && (
-        <Alert type="error" message="Erreur de chargement" description={error} showIcon />
+        <Alert
+          type="error"
+          message="Impossible d'afficher les cinémas"
+          description="Réessayez dans un instant."
+          showIcon
+        />
       )}
 
       {!loading && !error && cinemas.length === 0 && (
         <Empty
           description={
             debouncedSearch
-              ? `Aucun cinéma trouvé pour « ${debouncedSearch} »`
-              : 'Aucun cinéma disponible pour le moment'
+              ? `Aucun cinéma ne correspond à « ${debouncedSearch} ». Essayez un autre nom ou une autre ville.`
+              : 'Aucun cinéma n’est disponible pour le moment.'
           }
         />
       )}

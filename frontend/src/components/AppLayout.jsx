@@ -20,7 +20,7 @@ const guestNavItems = [
 
 const adminNavItem = {
   key: '/admin',
-  label: <Link to="/admin">Administration</Link>,
+  label: <Link to="/admin">Gestion</Link>,
 }
 
 const logoutNavItem = {
@@ -155,7 +155,7 @@ function AppLayout() {
           fontSize: 15,
         }}
       >
-        Cinema Gestion © {new Date().getFullYear()}
+        Cinema Gestion © {new Date().getFullYear()} — Trouvez votre séance
       </Footer>
     </Layout>
   )

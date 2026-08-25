@@ -5,27 +5,32 @@ import {
   Button,
   DatePicker,
   Form,
-  InputNumber,
   Popconfirm,
   Select,
   message,
 } from 'antd'
 import { ArrowLeftOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
-import { cinemaApi, roomApi } from '../../api/admin'
+import { movieApi, movieShowApi, scheduleApi } from '../../api/admin'
 import { ApiError } from '../../api/client'
 import AdminFormModal from '../../components/admin/AdminFormModal'
 import AdminPageLayout from '../../components/admin/AdminPageLayout'
+import { formatDateTime } from '../../utils/formatDate'
 
 const EMPTY_FORM = {
-  capacity: null,
-  constructionDate: null,
-  cinemaId: null,
+  movieShowId: null,
+  startTime: null,
+  endTime: null,
 }
 
-function AdminRoomsPage() {
+function toApiDateTime(value) {
+  return value ? value.format('YYYY-MM-DDTHH:mm:ss') : null
+}
+
+function AdminSchedulesPage() {
   const [rows, setRows] = useState([])
-  const [cinemas, setCinemas] = useState([])
+  const [movieShows, setMovieShows] = useState([])
+  const [movieTitles, setMovieTitles] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [page, setPage] = useState(0)
@@ -36,58 +41,83 @@ function AdminRoomsPage() {
   const [editingRow, setEditingRow] = useState(null)
   const [saving, setSaving] = useState(false)
 
-  const cinemaNames = useMemo(
-    () => Object.fromEntries(cinemas.map((cinema) => [cinema.id, cinema.name])),
-    [cinemas],
+  const movieShowLabels = useMemo(
+    () =>
+      Object.fromEntries(
+        movieShows.map((show) => {
+          const title = movieTitles[show.movieId] ?? `Film n°${show.movieId}`
+          const price =
+            show.price != null ? `${Number(show.price).toFixed(2)} €` : '—'
+          return [show.id, `${title} — salle n°${show.roomId} — ${price}`]
+        }),
+      ),
+    [movieShows, movieTitles],
   )
 
-  const cinemaOptions = useMemo(
+  const movieShowOptions = useMemo(
     () =>
-      cinemas.map((cinema) => ({
-        value: cinema.id,
-        label: `${cinema.name} (${cinema.city})`,
+      movieShows.map((show) => ({
+        value: show.id,
+        label: movieShowLabels[show.id] ?? `Séance n°${show.id}`,
       })),
-    [cinemas],
+    [movieShows, movieShowLabels],
   )
 
   useEffect(() => {
-    async function loadCinemas() {
+    async function loadLookups() {
       try {
-        const data = await cinemaApi.list({ page: 0, size: 100 })
-        setCinemas(data.content ?? [])
+        const [showsData, moviesData] = await Promise.all([
+          movieShowApi.list({ page: 0, size: 100 }),
+          movieApi.list({ page: 0, size: 100 }),
+        ])
+
+        setMovieShows(showsData.content ?? [])
+        setMovieTitles(
+          Object.fromEntries(
+            (moviesData.content ?? []).map((movie) => [movie.id, movie.title]),
+          ),
+        )
       } catch {
-        setCinemas([])
+        setMovieShows([])
+        setMovieTitles({})
       }
     }
 
-    loadCinemas()
+    loadLookups()
   }, [])
 
   const columns = useMemo(
     () => [
       { title: 'Réf.', dataIndex: 'id', key: 'id', width: 80 },
       {
-        title: 'Capacité',
-        dataIndex: 'capacity',
-        key: 'capacity',
-        render: (value) => `${value} places`,
+        title: 'Séance',
+        dataIndex: 'movieShowId',
+        key: 'movieShowId',
+        render: (movieShowId) =>
+          movieShowLabels[movieShowId] ?? `Séance n°${movieShowId}`,
       },
       {
-        title: 'Cinéma',
-        dataIndex: 'cinemaId',
-        key: 'cinemaId',
-        render: (cinemaId) => cinemaNames[cinemaId] ?? `Cinéma n°${cinemaId}`,
+        title: 'Début',
+        dataIndex: 'startTime',
+        key: 'startTime',
+        render: (value) => formatDateTime(value),
+      },
+      {
+        title: 'Fin',
+        dataIndex: 'endTime',
+        key: 'endTime',
+        render: (value) => formatDateTime(value),
       },
     ],
-    [cinemaNames],
+    [movieShowLabels],
   )
 
-  const loadRooms = useCallback(async () => {
+  const loadSchedules = useCallback(async () => {
     setLoading(true)
     setError(null)
 
     try {
-      const data = await roomApi.list({
+      const data = await scheduleApi.list({
         page,
         size: pageSize,
         search: search || undefined,
@@ -97,7 +127,7 @@ function AdminRoomsPage() {
       setTotalElements(data.totalElements ?? 0)
     } catch (err) {
       const errorMessage =
-        err instanceof ApiError ? err.message : 'Impossible de charger les salles'
+        err instanceof ApiError ? err.message : 'Impossible de charger les horaires'
       setError(errorMessage)
       setRows([])
       setTotalElements(0)
@@ -107,8 +137,8 @@ function AdminRoomsPage() {
   }, [page, pageSize, search])
 
   useEffect(() => {
-    loadRooms()
-  }, [loadRooms])
+    loadSchedules()
+  }, [loadSchedules])
 
   const handlePageChange = (nextPage, nextPageSize) => {
     setPage(nextPage)
@@ -140,28 +170,27 @@ function AdminRoomsPage() {
 
     try {
       const payload = {
-        capacity: values.capacity,
-        constructionDate: values.constructionDate.format('YYYY-MM-DD'),
-        cinemaId: values.cinemaId,
-        movieShowIds: [],
+        movieShowId: values.movieShowId,
+        startTime: toApiDateTime(values.startTime),
+        endTime: toApiDateTime(values.endTime),
       }
 
       if (editingRow) {
-        await roomApi.update(editingRow.id, {
+        await scheduleApi.update(editingRow.id, {
           id: editingRow.id,
           ...payload,
         })
-        message.success('Salle mise à jour')
+        message.success('Horaire mis à jour')
       } else {
-        await roomApi.create(payload)
-        message.success('Salle créée')
+        await scheduleApi.create(payload)
+        message.success('Horaire créé')
       }
 
       closeModal()
-      await loadRooms()
+      await loadSchedules()
     } catch (err) {
       const errorMessage =
-        err instanceof ApiError ? err.message : 'Impossible d\'enregistrer la salle'
+        err instanceof ApiError ? err.message : "Impossible d'enregistrer l'horaire"
       message.error(errorMessage)
     } finally {
       setSaving(false)
@@ -170,33 +199,33 @@ function AdminRoomsPage() {
 
   const handleDelete = useCallback(
     async (record) => {
-      const label = `${record.capacity} places — ${cinemaNames[record.cinemaId] ?? `Cinéma n°${record.cinemaId}`}`
+      const label = formatDateTime(record.startTime)
 
       try {
-        await roomApi.delete(record.id)
-        message.success(`« ${label} » supprimée`)
+        await scheduleApi.delete(record.id)
+        message.success(`Horaire du ${label} supprimé`)
 
         if (rows.length === 1 && page > 0) {
           setPage((current) => current - 1)
         } else {
-          await loadRooms()
+          await loadSchedules()
         }
       } catch (err) {
         const errorMessage =
-          err instanceof ApiError ? err.message : 'Impossible de supprimer la salle'
+          err instanceof ApiError ? err.message : "Impossible de supprimer l'horaire"
         message.error(errorMessage)
       }
     },
-    [cinemaNames, loadRooms, page, rows.length],
+    [loadSchedules, page, rows.length],
   )
 
   const formInitialValues = useMemo(
     () =>
       editingRow
         ? {
-            capacity: editingRow.capacity ?? null,
-            cinemaId: editingRow.cinemaId ?? null,
-            constructionDate: null,
+            movieShowId: editingRow.movieShowId ?? null,
+            startTime: editingRow.startTime ? dayjs(editingRow.startTime) : null,
+            endTime: editingRow.endTime ? dayjs(editingRow.endTime) : null,
           }
         : EMPTY_FORM,
     [editingRow],
@@ -213,7 +242,7 @@ function AdminRoomsPage() {
             Modifier
           </Button>
           <Popconfirm
-            title="Supprimer cette salle ?"
+            title="Supprimer cet horaire ?"
             description="Cette action est définitive."
             okText="Supprimer"
             cancelText="Annuler"
@@ -242,19 +271,19 @@ function AdminRoomsPage() {
         <Alert
           type="error"
           showIcon
-          message="Impossible d'afficher les salles"
+          message="Impossible d'afficher les horaires"
           description={error}
           style={{ marginBottom: 24 }}
         />
       )}
 
       <AdminPageLayout
-        title="Salles"
-        description="Gérez les salles de projection et leur capacité."
-        searchPlaceholder="Rechercher par capacité ou cinéma..."
+        title="Horaires"
+        description="Planifiez les créneaux de diffusion pour chaque séance."
+        searchPlaceholder="Rechercher une date (ex. 2026-08-22)..."
         searchValue={search}
         onSearchChange={handleSearchChange}
-        createLabel="Ajouter une salle"
+        createLabel="Ajouter un horaire"
         onCreate={openCreate}
         columns={columns}
         dataSource={rows}
@@ -268,7 +297,7 @@ function AdminRoomsPage() {
 
       <AdminFormModal
         open={modalOpen}
-        title={editingRow ? 'Modifier la salle' : 'Ajouter une salle'}
+        title={editingRow ? "Modifier l'horaire" : 'Ajouter un horaire'}
         initialValues={formInitialValues}
         loading={saving}
         onCancel={closeModal}
@@ -276,38 +305,56 @@ function AdminRoomsPage() {
         okText={editingRow ? 'Mettre à jour' : 'Créer'}
       >
         <Form.Item
-          label="Capacité"
-          name="capacity"
-          rules={[{ required: true, message: 'Capacité requise' }]}
+          label="Séance"
+          name="movieShowId"
+          rules={[{ required: true, message: 'Séance requise' }]}
         >
-          <InputNumber min={1} placeholder="350" size="large" style={{ width: '100%' }} />
-        </Form.Item>
-
-        <Form.Item
-          label="Date de construction"
-          name="constructionDate"
-          rules={[{ required: true, message: 'Date requise' }]}
-        >
-          <DatePicker
-            format="DD/MM/YYYY"
-            placeholder="15/03/1998"
+          <Select
+            showSearch
+            placeholder="Choisir une séance"
             size="large"
-            style={{ width: '100%' }}
-            disabledDate={(current) => current && current > dayjs().endOf('day')}
+            options={movieShowOptions}
+            optionFilterProp="label"
           />
         </Form.Item>
 
         <Form.Item
-          label="Cinéma"
-          name="cinemaId"
-          rules={[{ required: true, message: 'Cinéma requis' }]}
+          label="Début"
+          name="startTime"
+          rules={[{ required: true, message: 'Date/heure de début requise' }]}
         >
-          <Select
-            showSearch
-            placeholder="Choisir un cinéma"
+          <DatePicker
+            showTime={{ format: 'HH:mm' }}
+            format="DD/MM/YYYY HH:mm"
+            placeholder="22/08/2026 14:00"
             size="large"
-            options={cinemaOptions}
-            optionFilterProp="label"
+            style={{ width: '100%' }}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="Fin"
+          name="endTime"
+          dependencies={['startTime']}
+          rules={[
+            { required: true, message: 'Date/heure de fin requise' },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                const start = getFieldValue('startTime')
+                if (!value || !start || value.isAfter(start)) {
+                  return Promise.resolve()
+                }
+                return Promise.reject(new Error('La fin doit être après le début'))
+              },
+            }),
+          ]}
+        >
+          <DatePicker
+            showTime={{ format: 'HH:mm' }}
+            format="DD/MM/YYYY HH:mm"
+            placeholder="22/08/2026 16:30"
+            size="large"
+            style={{ width: '100%' }}
           />
         </Form.Item>
       </AdminFormModal>
@@ -315,4 +362,4 @@ function AdminRoomsPage() {
   )
 }
 
-export default AdminRoomsPage
+export default AdminSchedulesPage

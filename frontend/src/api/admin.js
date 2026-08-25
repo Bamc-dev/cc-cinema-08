@@ -56,3 +56,19 @@ export const movieApi = {
   update: (id, body) => updateResource('movie', id, body),
   delete: (id) => deleteResource('movie', id),
 }
+
+export const movieShowApi = {
+  list: (options) => listResource('movie-show', options),
+  find: (id) => findResource('movie-show', id),
+  create: (body) => createResource('movie-show', body),
+  update: (id, body) => updateResource('movie-show', id, body),
+  delete: (id) => deleteResource('movie-show', id),
+}
+
+export const scheduleApi = {
+  list: (options) => listResource('schedule', options),
+  find: (id) => findResource('schedule', id),
+  create: (body) => createResource('schedule', body),
+  update: (id, body) => updateResource('schedule', id, body),
+  delete: (id) => deleteResource('schedule', id),
+}

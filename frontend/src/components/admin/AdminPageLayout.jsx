@@ -53,7 +53,7 @@ function AdminPageLayout({
       <Title level={2}>{title}</Title>
       {description && <Paragraph type="secondary">{description}</Paragraph>}
 
-      <Space direction="vertical" size="large" style={{ width: '100%', marginTop: 8 }}>
+      <Space orientation="vertical" size="large" style={{ width: '100%', marginTop: 8 }}>
         <div
           style={{
             display: 'flex',

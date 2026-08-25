@@ -40,7 +40,7 @@ const showtimeColumns = [
   {
     title: 'Salle',
     key: 'room',
-    render: (_, record) => `Salle #${record.roomId} (${record.roomCapacity} places)`,
+    render: (_, record) => `Salle n°${record.roomId} (${record.roomCapacity} places)`,
   },
 ]
 
@@ -117,7 +117,7 @@ function CinemaProgramPage() {
 
       <Title level={2}>{selectedCinema.name}</Title>
       <Paragraph type="secondary" style={{ marginBottom: 32 }}>
-        Programmation du jour — séances prévues aujourd&apos;hui
+        Ce qui passe aujourd&apos;hui
         {selectedCinema.city ? ` · ${selectedCinema.city}` : ''}
       </Paragraph>
 
@@ -128,11 +128,16 @@ function CinemaProgramPage() {
       )}
 
       {!loading && error && (
-        <Alert type="error" message="Erreur de chargement" description={error} showIcon />
+        <Alert
+          type="error"
+          message="Impossible d'afficher la programmation"
+          description="Réessayez dans un instant."
+          showIcon
+        />
       )}
 
       {!loading && !error && movies.length === 0 && (
-        <Empty description="Aucune séance prévue aujourd'hui dans ce cinéma" />
+        <Empty description="Aucune séance prévue aujourd'hui. Revenez demain ou choisissez un autre cinéma." />
       )}
 
       {!loading && !error && movies.length > 0 && (

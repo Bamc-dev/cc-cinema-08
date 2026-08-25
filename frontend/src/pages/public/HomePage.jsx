@@ -60,22 +60,22 @@ function HomePage() {
         }}
       >
         <Title level={1} style={{ marginBottom: 16 }}>
-          Bienvenue sur Cinema Gestion
+          Vos séances, simplement
         </Title>
         <Paragraph type="secondary" style={{ fontSize: 18, maxWidth: 640, margin: '0 auto 32px' }}>
-          Découvrez les films à l&apos;affiche, explorez les cinémas et consultez la programmation
-          du jour.
+          Parcourez les films à l&apos;affiche, trouvez un cinéma près de chez vous et consultez
+          les horaires du jour.
         </Paragraph>
 
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link to="/cinemas">
             <Button type="primary" size="large" icon={<BankOutlined />}>
-              Voir les cinémas
+              Trouver un cinéma
             </Button>
           </Link>
           <Link to="/films">
             <Button size="large" icon={<VideoCameraOutlined />}>
-              Tous les films
+              Voir les films
             </Button>
           </Link>
         </div>
@@ -94,16 +94,16 @@ function HomePage() {
         >
           <div>
             <Title level={2} style={{ marginBottom: 4 }}>
-              Films disponibles
+              À l&apos;affiche
             </Title>
             <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-              Aperçu des films actuellement référencés
+              Une sélection des films disponibles
             </Paragraph>
           </div>
 
           {movies.length > PREVIEW_LIMIT && (
             <Link to="/films">
-              <Button type="link">Voir tous les films ({movies.length})</Button>
+              <Button type="link">Voir tout le catalogue ({movies.length})</Button>
             </Link>
           )}
         </div>
@@ -115,11 +115,16 @@ function HomePage() {
         )}
 
         {!loading && error && (
-          <Alert type="error" message="Erreur de chargement" description={error} showIcon />
+          <Alert
+            type="error"
+            message="Impossible d'afficher les films"
+            description="Réessayez dans un instant. Si le problème continue, contactez le support."
+            showIcon
+          />
         )}
 
         {!loading && !error && movies.length === 0 && (
-          <Empty description="Aucun film disponible pour le moment" />
+          <Empty description="Aucun film à l'affiche pour le moment. Revenez bientôt !" />
         )}
 
         {!loading && !error && previewMovies.length > 0 && (
@@ -135,7 +140,7 @@ function HomePage() {
             {movies.length > PREVIEW_LIMIT && (
               <div style={{ textAlign: 'center', marginTop: 32 }}>
                 <Link to="/films">
-                  <Button size="large">Voir tous les films</Button>
+                  <Button size="large">Explorer tous les films</Button>
                 </Link>
               </div>
             )}

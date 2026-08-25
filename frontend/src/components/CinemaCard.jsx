@@ -42,7 +42,7 @@ function CinemaCard({ cinema }) {
       </div>
 
       <Button type="primary" block onClick={handleOpenProgram} style={{ marginTop: 'auto' }}>
-        Programmation du jour
+        Voir la programmation
       </Button>
     </Card>
   )

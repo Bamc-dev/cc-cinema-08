@@ -17,6 +17,9 @@ import com.cinema.cinema_gestion.dto.auth.ForgotPasswordRequest;
 import com.cinema.cinema_gestion.dto.auth.LoginRequest;
 import com.cinema.cinema_gestion.dto.auth.RegisterRequest;
 import com.cinema.cinema_gestion.dto.auth.ResetPasswordRequest;
+import com.cinema.cinema_gestion.entity.security.User;
+import com.cinema.cinema_gestion.repository.PasswordResetTokenRepository;
+import com.cinema.cinema_gestion.repository.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -30,6 +33,12 @@ class SecurityIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Test
     void register_isPublic() throws Exception {
@@ -100,16 +109,15 @@ class SecurityIntegrationTest {
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isOk());
 
-        String forgotResponse = mockMvc.perform(post("/auth/forgot-password")
+        mockMvc.perform(post("/auth/forgot-password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new ForgotPasswordRequest("reset@test.com"))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.resetToken").isNotEmpty())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+                .andExpect(jsonPath("$.message").isNotEmpty())
+                .andExpect(jsonPath("$.resetToken").doesNotExist());
 
-        String resetToken = objectMapper.readTree(forgotResponse).get("resetToken").asText();
+        User user = userRepository.findByEmail("reset@test.com").orElseThrow();
+        String resetToken = passwordResetTokenRepository.findByUser(user).orElseThrow().getToken();
 
         mockMvc.perform(post("/auth/reset-password")
                         .contentType(MediaType.APPLICATION_JSON)

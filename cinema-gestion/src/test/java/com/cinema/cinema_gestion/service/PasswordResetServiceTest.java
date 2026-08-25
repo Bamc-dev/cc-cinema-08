@@ -3,6 +3,7 @@ package com.cinema.cinema_gestion.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,6 +43,9 @@ class PasswordResetServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private MailService mailService;
+
     private PasswordResetService passwordResetService;
     private User user;
 
@@ -52,6 +56,7 @@ class PasswordResetServiceTest {
                 passwordResetTokenRepository,
                 refreshTokenService,
                 passwordEncoder,
+                mailService,
                 900_000L);
         user = new User();
         user.setId(1L);
@@ -64,6 +69,8 @@ class PasswordResetServiceTest {
         assertThatThrownBy(() -> passwordResetService.forgotPassword(new ForgotPasswordRequest("  ")))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("Email is required");
+
+        verify(mailService, never()).sendPasswordResetEmail(any(), any(), any());
     }
 
     @Test
@@ -73,10 +80,12 @@ class PasswordResetServiceTest {
         assertThatThrownBy(() -> passwordResetService.forgotPassword(new ForgotPasswordRequest("missing@test.com")))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("No account found");
+
+        verify(mailService, never()).sendPasswordResetEmail(any(), any(), any());
     }
 
     @Test
-    void forgotPassword_whenUserExists_createsResetToken() {
+    void forgotPassword_whenUserExists_createsResetTokenAndSendsEmail() {
         when(userRepository.findByEmail("user@test.com")).thenReturn(Optional.of(user));
         when(passwordResetTokenRepository.findByUser(user)).thenReturn(Optional.empty());
         when(passwordResetTokenRepository.save(any(PasswordResetToken.class)))
@@ -84,11 +93,14 @@ class PasswordResetServiceTest {
 
         ForgotPasswordResponse response = passwordResetService.forgotPassword(new ForgotPasswordRequest("user@test.com"));
 
-        assertThat(response.resetToken()).isNotBlank();
+        assertThat(response.message()).contains("email");
         assertThat(response.expiresAt()).isAfter(LocalDateTime.now());
         ArgumentCaptor<PasswordResetToken> captor = ArgumentCaptor.forClass(PasswordResetToken.class);
         verify(passwordResetTokenRepository).save(captor.capture());
-        assertThat(captor.getValue().getUser()).isEqualTo(user);
+        PasswordResetToken saved = captor.getValue();
+        assertThat(saved.getUser()).isEqualTo(user);
+        assertThat(saved.getToken()).isNotBlank();
+        verify(mailService).sendPasswordResetEmail(eq("user@test.com"), eq(saved.getToken()), eq(saved.getExpiryDate()));
     }
 
     @Test

@@ -25,6 +25,7 @@ public class PasswordResetService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final RefreshTokenService refreshTokenService;
     private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
     private final long resetExpirationMs;
 
     public PasswordResetService(
@@ -32,11 +33,13 @@ public class PasswordResetService {
             PasswordResetTokenRepository passwordResetTokenRepository,
             RefreshTokenService refreshTokenService,
             PasswordEncoder passwordEncoder,
+            MailService mailService,
             @Value("${security.jwt.reset-expiration-ms:900000}") long resetExpirationMs) {
         this.userRepository = userRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.refreshTokenService = refreshTokenService;
         this.passwordEncoder = passwordEncoder;
+        this.mailService = mailService;
         this.resetExpirationMs = resetExpirationMs;
     }
 
@@ -57,12 +60,9 @@ public class PasswordResetService {
         resetToken.setExpiryDate(expiresAt);
         passwordResetTokenRepository.save(resetToken);
 
-        // Pas de SMTP dans le projet : le token est renvoyé pour pouvoir tester via .http / Swagger.
-        // En production, on l'enverrait par e-mail et on ne l'exposerait pas ici.
-        return new ForgotPasswordResponse(
-                resetToken.getToken(),
-                expiresAt,
-                "Password reset token generated. In production this would be sent by email.");
+        mailService.sendPasswordResetEmail(user.getEmail(), resetToken.getToken(), expiresAt);
+
+        return new ForgotPasswordResponse("A password reset email has been sent.", expiresAt);
     }
 
     @Transactional

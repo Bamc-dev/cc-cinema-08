@@ -5,6 +5,9 @@ import { SelectedMovieProvider } from './context/SelectedMovieContext'
 import ProtectedRoute from './auth/ProtectedRoute'
 import AppLayout from './components/AppLayout'
 import AdminHomePage from './pages/admin/AdminHomePage'
+import AdminCinemasPage from './pages/admin/AdminCinemasPage'
+import AdminMoviesPage from './pages/admin/AdminMoviesPage'
+import AdminRoomsPage from './pages/admin/AdminRoomsPage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
@@ -35,6 +38,9 @@ function App() {
 
               <Route element={<ProtectedRoute />}>
                 <Route path="/admin" element={<AdminHomePage />} />
+                <Route path="/admin/cinemas" element={<AdminCinemasPage />} />
+                <Route path="/admin/rooms" element={<AdminRoomsPage />} />
+                <Route path="/admin/movies" element={<AdminMoviesPage />} />
               </Route>
             </Route>
             </Routes>

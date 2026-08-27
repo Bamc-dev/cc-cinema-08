@@ -5,10 +5,17 @@ import com.cinema.cinema_gestion.enumerator.MovieGenre;
 import java.time.LocalDate;
 import java.util.Set;
 
+/**
+ * DTO CRUD d'un film : payload d'entrée/sortie pour créer ou modifier un film.
+ */
 public class MovieDTOCRUD extends BaseDTO {
+    /** Titre du film. */
     private String title;
+    /** Date de sortie. */
     private LocalDate releaseDate;
+    /** Genre cinématographique. */
     private MovieGenre genre;
+    /** Identifiants des séances associées. */
     private Set<Long> movieShowIds;
 
     public MovieDTOCRUD() {

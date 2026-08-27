@@ -26,6 +26,9 @@ function formatPrice(price) {
   return `${Number(price).toFixed(2)} €`
 }
 
+/**
+ * CRUD admin des séances : association film / salle et prix (les horaires se gèrent à part).
+ */
 function AdminMovieShowsPage() {
   const [rows, setRows] = useState([])
   const [movies, setMovies] = useState([])

@@ -20,6 +20,9 @@ const EMPTY_FORM = {
   number: '',
 }
 
+/**
+ * CRUD admin des cinémas (liste paginée, recherche, création, édition, suppression).
+ */
 function AdminCinemasPage() {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)

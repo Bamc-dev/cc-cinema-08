@@ -20,6 +20,10 @@ import org.springframework.util.AntPathMatcher;
 
 import com.cinema.cinema_gestion.config.SecurityConfig;
 
+/**
+ * Filtre HTTP : valide le JWT Bearer et peuple le {@link SecurityContextHolder}.
+ * Les chemins publics (propriété {@code security.route.public.paths}) sont ignorés.
+ */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
@@ -28,6 +32,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Value("${security.route.public.paths}")
     private final String[] AUTH_PUBLIC_PATHS;
 
+    /**
+     * @param jwtService                validation et extraction du JWT
+     * @param customUserDetailsService  chargement de l'utilisateur par id (sujet du token)
+     * @param AUTH_PUBLIC_PATHS         motifs Ant des routes publiques
+     */
     public JwtAuthenticationFilter(JwtService jwtService, CustomUserDetailsService customUserDetailsService, @Value("${security.route.public.paths}") String[] AUTH_PUBLIC_PATHS) {
         this.jwtService = jwtService;
         this.customUserDetailsService = customUserDetailsService;
@@ -72,6 +81,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * @param uri URI de la requête
+     * @return {@code true} si l'URI correspond à un chemin public
+     */
     private boolean isPublicPath(String uri) {
         for (String pattern : AUTH_PUBLIC_PATHS) {
             if (PATH_MATCHER.match(pattern, uri)) {

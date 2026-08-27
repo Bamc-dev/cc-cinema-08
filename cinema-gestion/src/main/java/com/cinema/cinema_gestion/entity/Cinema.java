@@ -8,17 +8,26 @@ import jakarta.persistence.CascadeType;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Entité représentant un cinéma (établissement).
+ * Un cinéma possède une adresse (ville, rue, numéro) et une collection de salles {@link Room}.
+ */
 @Entity
 @Table(name = "cinema", indexes = {
         @Index(name = "idx_cinema_name", columnList = "name")
 })
 public class Cinema extends BaseEntity {
 
+    /** Nom commercial du cinéma. */
     private String name;
+    /** Ville d'implantation. */
     private String city;
+    /** Rue de l'adresse. */
     private String street;
+    /** Numéro de voie. */
     private String number;
 
+    /** Salles rattachées à ce cinéma (cascade et suppression des orphelins). */
     @OneToMany(mappedBy = "cinema", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Room> rooms;
 

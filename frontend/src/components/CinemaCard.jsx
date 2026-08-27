@@ -11,6 +11,11 @@ function formatAddress(cinema) {
   return parts.join(', ')
 }
 
+/**
+ * Carte d'un cinéma : nom, adresse, et accès à la programmation du jour.
+ * @param {object} props
+ * @param {object} props.cinema Cinéma public (id, name, city, street, number).
+ */
 function CinemaCard({ cinema }) {
   const navigate = useNavigate()
   const { selectCinema } = useSelectedCinema()

@@ -4,6 +4,17 @@ import { Form, Modal } from 'antd'
 /**
  * Modal + Form réutilisable pour create / edit admin.
  * Les champs (Form.Item) sont passés en children.
+ * @param {object} props
+ * @param {boolean} props.open Contrôle l'affichage de la modal.
+ * @param {string} props.title Titre de la modal.
+ * @param {object} [props.initialValues={}] Valeurs initiales du formulaire (rechargées à l'ouverture).
+ * @param {boolean} [props.loading=false] État de soumission (bouton OK).
+ * @param {() => void} props.onCancel Fermeture sans enregistrer.
+ * @param {(values: object) => void|Promise<void>} props.onSubmit Handler onFinish du Form.
+ * @param {import('react').ReactNode} props.children Champs Form.Item.
+ * @param {number} [props.width=520] Largeur de la modal.
+ * @param {string} [props.okText='Enregistrer'] Libellé du bouton de validation.
+ * @param {string} [props.cancelText='Annuler'] Libellé du bouton d'annulation.
  */
 function AdminFormModal({
   open,

@@ -12,6 +12,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+/**
+ * Envoi d'e-mails transactionnels. Si {@code app.mail.enabled} est faux, le lien est seulement loggué.
+ */
 @Service
 public class MailService {
     private static final Logger log = LoggerFactory.getLogger(MailService.class);
@@ -21,6 +24,12 @@ public class MailService {
     private final String from;
     private final String frontendBaseUrl;
 
+    /**
+     * @param mailSender      client SMTP Spring
+     * @param enabled         active réellement l'envoi
+     * @param from            adresse expéditeur
+     * @param frontendBaseUrl URL du SPA (lien de reset)
+     */
     public MailService(
             JavaMailSender mailSender,
             @Value("${app.mail.enabled:false}") boolean enabled,
@@ -32,6 +41,13 @@ public class MailService {
         this.frontendBaseUrl = frontendBaseUrl;
     }
 
+    /**
+     * Envoie (ou loggue) le lien {@code /reset-password?token=...}.
+     *
+     * @param to        destinataire
+     * @param token     token opaque
+     * @param expiresAt date d'expiration affichée dans le corps
+     */
     public void sendPasswordResetEmail(String to, String token, LocalDateTime expiresAt) {
         String resetLink = buildResetLink(token);
         String body = """
@@ -62,6 +78,10 @@ public class MailService {
         }
     }
 
+    /**
+     * @param token token de reset
+     * @return URL frontend complète
+     */
     String buildResetLink(String token) {
         String base = frontendBaseUrl.endsWith("/")
                 ? frontendBaseUrl.substring(0, frontendBaseUrl.length() - 1)

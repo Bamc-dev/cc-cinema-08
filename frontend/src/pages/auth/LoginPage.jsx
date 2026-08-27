@@ -7,6 +7,9 @@ import { ApiError } from '../../api/client'
 
 const { Title, Paragraph } = Typography
 
+/**
+ * Formulaire de connexion ; redirige vers l'espace admin (ou la page d'origine) une fois authentifié.
+ */
 function LoginPage() {
   const { login, isAuthenticated } = useAuth()
   const location = useLocation()

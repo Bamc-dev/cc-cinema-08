@@ -7,6 +7,10 @@ import com.cinema.cinema_gestion.dto.room.RoomDTOCRUD;
 import com.cinema.cinema_gestion.dto.room.RoomDTOView;
 import com.cinema.cinema_gestion.service.RoomService;
 
+/**
+ * CRUD REST des salles ({@code /api/room}).
+ * Hérite des verbes génériques find/list/create/update/delete.
+ */
 @RestController
 @RequestMapping("/api/room")
 public class RoomController extends GenericCRUDController<RoomDTOCRUD, RoomDTOView, RoomService> {

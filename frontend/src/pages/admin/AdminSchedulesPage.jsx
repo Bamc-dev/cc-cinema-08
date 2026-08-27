@@ -27,6 +27,9 @@ function toApiDateTime(value) {
   return value ? value.format('YYYY-MM-DDTHH:mm:ss') : null
 }
 
+/**
+ * CRUD admin des horaires de diffusion (début / fin) rattachés à une séance.
+ */
 function AdminSchedulesPage() {
   const [rows, setRows] = useState([])
   const [movieShows, setMovieShows] = useState([])

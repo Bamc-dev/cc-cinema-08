@@ -14,13 +14,26 @@ import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service métier des salles : CRUD générique et recherche par nom de cinéma ou capacité.
+ */
 @Service
 public class RoomService extends GenericService<Room, RoomDTOCRUD, RoomDTOView, RoomMapper, RoomRepository> {
 
+    /**
+     * @param repository repository des salles
+     * @param mapper     mapper salle
+     */
     public RoomService(RoomRepository repository, RoomMapper mapper) {
         super(repository, mapper);
     }
 
+    /**
+     * Filtre sur le nom du cinéma associé, et sur la capacité si {@code search} est un entier.
+     *
+     * @param search texte déjà trimé
+     * @return spécification JPA
+     */
     @Override
     protected Specification<Room> buildSearchSpecification(String search) {
         String pattern = likePattern(search);

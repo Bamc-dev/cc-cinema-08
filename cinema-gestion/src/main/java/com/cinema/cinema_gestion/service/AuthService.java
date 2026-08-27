@@ -14,6 +14,9 @@ import com.cinema.cinema_gestion.dto.auth.RegisterRequest;
 import com.cinema.cinema_gestion.entity.security.User;
 import com.cinema.cinema_gestion.repository.UserRepository;
 
+/**
+ * Inscription, connexion, renouvellement et révocation des sessions JWT.
+ */
 @Service
 public class AuthService {
     private final AuthenticationManager authenticationManager;
@@ -23,6 +26,14 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * @param authenticationManager     authentification e-mail / mot de passe
+     * @param customUserDetailsService  chargement de l'utilisateur
+     * @param jwtService                émission des access tokens
+     * @param refreshTokenService       rotation des refresh tokens
+     * @param userRepository            persistance des comptes
+     * @param passwordEncoder           hachage BCrypt
+     */
     public AuthService(
             AuthenticationManager authenticationManager,
             CustomUserDetailsService customUserDetailsService,
@@ -38,6 +49,12 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Crée un compte {@code USER} et émet une paire de tokens.
+     *
+     * @param request e-mail et mot de passe
+     * @return access et refresh tokens
+     */
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         String email = request.email() == null ? "" : request.email().trim();
@@ -59,6 +76,12 @@ public class AuthService {
         return new AuthResponse(accessToken, refreshToken);
     }
 
+    /**
+     * Authentifie l'utilisateur et émet une nouvelle paire de tokens (rotation du refresh).
+     *
+     * @param request identifiants
+     * @return access et refresh tokens
+     */
     @Transactional
     public AuthResponse login(LoginRequest request) {
         authenticationManager.authenticate(
@@ -70,6 +93,12 @@ public class AuthService {
         return new AuthResponse(accessToken, refreshToken);
     }
 
+    /**
+     * Vérifie le refresh token et émet une nouvelle paire.
+     *
+     * @param token refresh token opaque
+     * @return nouveaux tokens
+     */
     @Transactional
     public AuthResponse refresh(String token) {
         User user = refreshTokenService.verifyAndGetUser(token);
@@ -78,6 +107,11 @@ public class AuthService {
         return new AuthResponse(accessToken, refreshToken);
     }
 
+    /**
+     * Révoque le refresh token de l'utilisateur (déconnexion).
+     *
+     * @param refreshToken token à invalider
+     */
     @Transactional
     public void logout(String refreshToken) {
         User user = refreshTokenService.verifyAndGetUser(refreshToken);

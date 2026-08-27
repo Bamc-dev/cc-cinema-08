@@ -10,13 +10,21 @@ import jakarta.persistence.CascadeType;
 import java.util.Set;
 import java.util.HashSet;
 
+/**
+ * Entité représentant une salle de projection.
+ * Une salle appartient à un {@link Cinema} et accueille des séances {@link MovieShow}.
+ */
 @Entity
 public class Room extends BaseEntity {
+    /** Nombre de places assises. */
     private Integer capacity;
+    /** Date de construction de la salle. */
     private LocalDate constructionDate;
+    /** Cinéma propriétaire de la salle. */
     @ManyToOne
     @JoinColumn(name = "cinema_id")
     private Cinema cinema;
+    /** Séances programmées dans cette salle (cascade et suppression des orphelins). */
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MovieShow> movieShows;
     

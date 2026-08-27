@@ -13,6 +13,9 @@ const { CheckableTag } = Tag
 const SEARCH_DEBOUNCE_MS = 300
 const genreOptions = getGenreOptions()
 
+/**
+ * Catalogue public des films : recherche par titre et filtres par genre.
+ */
 function MoviesPage() {
   const [movies, setMovies] = useState([])
   const [loading, setLoading] = useState(true)

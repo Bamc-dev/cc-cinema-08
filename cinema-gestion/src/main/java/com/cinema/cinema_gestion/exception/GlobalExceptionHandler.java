@@ -21,11 +21,21 @@ import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+/**
+ * Gestion centralisée des erreurs REST : statut HTTP homogène et corps {@link ErrorResponse}.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    /**
+     * Relais des {@link ResponseStatusException} métier.
+     *
+     * @param ex      exception levée
+     * @param request requête courante
+     * @return corps d'erreur
+     */
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ErrorResponse> handleResponseStatusException(
             ResponseStatusException ex,
@@ -38,6 +48,13 @@ public class GlobalExceptionHandler {
         return buildResponse(status, message, request.getRequestURI());
     }
 
+    /**
+     * Identifiants invalides (login).
+     *
+     * @param ex      exception Spring Security
+     * @param request requête courante
+     * @return 401
+     */
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentialsException(
             BadCredentialsException ex,
@@ -46,6 +63,13 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.UNAUTHORIZED, message, request.getRequestURI());
     }
 
+    /**
+     * Utilisateur introuvable : même message que des identifiants invalides (pas d'énumération).
+     *
+     * @param ex      exception Spring Security
+     * @param request requête courante
+     * @return 401
+     */
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(
             UsernameNotFoundException ex,
@@ -53,6 +77,13 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.UNAUTHORIZED, "Invalid credentials", request.getRequestURI());
     }
 
+    /**
+     * Contrainte d'intégrité : 409 si unicité, 400 sinon.
+     *
+     * @param ex      exception JPA / JDBC
+     * @param request requête courante
+     * @return 409 ou 400
+     */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(
             DataIntegrityViolationException ex,
@@ -63,6 +94,13 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, "Invalid data", request.getRequestURI());
     }
 
+    /**
+     * Erreurs de validation Bean Validation, avec détail par champ.
+     *
+     * @param ex      exception de binding
+     * @param request requête courante
+     * @return 400
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException ex,
@@ -79,6 +117,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
+    /**
+     * Corps JSON illisible.
+     *
+     * @param ex      exception de parsing
+     * @param request requête courante
+     * @return 400
+     */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
             HttpMessageNotReadableException ex,
@@ -86,6 +131,13 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, "Malformed JSON request", request.getRequestURI());
     }
 
+    /**
+     * Accès refusé (autorisation).
+     *
+     * @param ex      exception Spring Security
+     * @param request requête courante
+     * @return 403
+     */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(
             AccessDeniedException ex,
@@ -93,6 +145,13 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.FORBIDDEN, "Access denied", request.getRequestURI());
     }
 
+    /**
+     * Filet de sécurité : toute exception non mappée (log + 500).
+     *
+     * @param ex      exception
+     * @param request requête courante
+     * @return 500
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(
             Exception ex,
@@ -101,10 +160,20 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", request.getRequestURI());
     }
 
+    /**
+     * @param status  statut HTTP
+     * @param message message utilisateur
+     * @param path    URI
+     * @return réponse JSON
+     */
     private ResponseEntity<ErrorResponse> buildResponse(HttpStatus status, String message, String path) {
         return ResponseEntity.status(status).body(ErrorResponse.of(status, message, path));
     }
 
+    /**
+     * @param ex violation d'intégrité
+     * @return {@code true} si contrainte d'unicité (nom ou code SQL 23505)
+     */
     private boolean isUniqueConstraintViolation(DataIntegrityViolationException ex) {
         Throwable root = ex.getMostSpecificCause();
         if (root instanceof ConstraintViolationException constraintViolation) {
@@ -115,6 +184,10 @@ public class GlobalExceptionHandler {
         return isUniqueConstraintMessage(root.getMessage());
     }
 
+    /**
+     * @param message message JDBC / Hibernate
+     * @return {@code true} si le texte évoque une unicité
+     */
     private boolean isUniqueConstraintMessage(String message) {
         if (message == null) {
             return false;

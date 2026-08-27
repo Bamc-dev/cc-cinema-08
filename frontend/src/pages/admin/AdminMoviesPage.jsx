@@ -70,6 +70,9 @@ const COLUMNS = [
   },
 ]
 
+/**
+ * CRUD admin du catalogue films (titre, genre, date de sortie).
+ */
 function AdminMoviesPage() {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)

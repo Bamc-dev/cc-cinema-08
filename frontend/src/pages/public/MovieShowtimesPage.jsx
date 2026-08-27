@@ -62,6 +62,10 @@ const showtimeColumns = [
   },
 ]
 
+/**
+ * Séances d'un film : filtre par date et par cinéma/ville.
+ * Exige un film sélectionné (via MovieCard) correspondant à l'id d'URL.
+ */
 function MovieShowtimesPage() {
   const { movieId } = useParams()
   const navigate = useNavigate()

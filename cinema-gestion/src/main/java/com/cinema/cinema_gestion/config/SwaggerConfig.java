@@ -8,8 +8,14 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.Components;
 
+/**
+ * Documentation OpenAPI / Swagger UI : schéma Bearer JWT.
+ */
 @Configuration
 public class SwaggerConfig {
+    /**
+     * @return description OpenAPI de l'API Cinema Gestion
+     */
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI().addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
@@ -19,6 +25,9 @@ public class SwaggerConfig {
                         .version("1.0"));
     }
 
+    /**
+     * @return schéma HTTP Bearer (JWT)
+     */
     private SecurityScheme createAPIKeyScheme() {
         return new SecurityScheme().type(SecurityScheme.Type.HTTP)
                 .bearerFormat("JWT")

@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { logout as logoutRequest, refresh as refreshRequest } from '../api/auth'
@@ -11,6 +12,11 @@ import {
 
 const AuthContext = createContext(null)
 
+/**
+ * Fournit l'état d'authentification (jetons, login, logout, refresh) à l'application.
+ * Enregistre aussi les callbacks utilisés par le client HTTP pour le refresh automatique.
+ * @param {{ children: import('react').ReactNode }} props
+ */
 export function AuthProvider({ children }) {
   const navigate = useNavigate()
   const [accessToken, setAccessToken] = useState(getAccessToken)
@@ -99,6 +105,10 @@ export function AuthProvider({ children }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
+/**
+ * Accède au contexte d'authentification.
+ * @returns {{ accessToken: string|null, refreshToken: string|null, isAuthenticated: boolean, login: Function, logout: Function, refreshSession: Function }}
+ */
 export function useAuth() {
   const context = useContext(AuthContext)
 

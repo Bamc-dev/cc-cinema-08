@@ -10,6 +10,9 @@ const { Title, Paragraph } = Typography
 
 const PREVIEW_LIMIT = 8
 
+/**
+ * Page d'accueil publique : accroche et aperçu des films à l'affiche.
+ */
 function HomePage() {
   const [movies, setMovies] = useState([])
   const [loading, setLoading] = useState(true)

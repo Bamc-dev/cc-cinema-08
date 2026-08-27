@@ -3,9 +3,15 @@ package com.cinema.cinema_gestion.dto.movieshow;
 import com.cinema.cinema_gestion.dto.BaseDTO;
 import java.time.LocalDateTime;
 
+/**
+ * DTO CRUD d'un créneau horaire : payload d'entrée/sortie pour créer ou modifier un horaire.
+ */
 public class ScheduleDTOCRUD extends BaseDTO {
+    /** Début de la projection. */
     private LocalDateTime startTime;
+    /** Fin de la projection. */
     private LocalDateTime endTime;
+    /** Identifiant de la séance parente. */
     private Long movieShowId;
 
     public ScheduleDTOCRUD() {

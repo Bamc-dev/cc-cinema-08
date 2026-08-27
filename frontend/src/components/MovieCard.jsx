@@ -8,6 +8,12 @@ import { formatGenre } from '../utils/genreLabels'
 
 const { Text } = Typography
 
+/**
+ * Carte d'un film : titre, genre, date de sortie, et éventuellement lien vers les séances.
+ * @param {object} props
+ * @param {object} props.movie Film public (id, title, genre, releaseDate).
+ * @param {boolean} [props.showShowtimesAction=false] Affiche le bouton « Voir les séances ».
+ */
 function MovieCard({ movie, showShowtimesAction = false }) {
   const navigate = useNavigate()
   const { selectMovie } = useSelectedMovie()

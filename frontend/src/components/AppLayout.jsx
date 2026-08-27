@@ -52,6 +52,9 @@ function getSelectedKey(pathname) {
   return '/'
 }
 
+/**
+ * Calque commun : en-tête, navigation (publique / invité / admin), contenu et pied de page.
+ */
 function AppLayout() {
   const location = useLocation()
   const navigate = useNavigate()

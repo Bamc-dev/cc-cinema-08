@@ -10,6 +10,24 @@ const SEARCH_DEBOUNCE_MS = 300
 
 /**
  * Template page admin : titre + description + toolbar (search + Ajouter) + AdminTable.
+ * @param {object} props
+ * @param {string} props.title Titre de la page.
+ * @param {string} [props.description] Sous-titre explicatif.
+ * @param {string} [props.searchPlaceholder] Placeholder du champ de recherche.
+ * @param {string} props.searchValue Valeur de recherche contrôlée (côté page).
+ * @param {(value: string) => void} [props.onSearchChange] Appelé après debounce (300 ms).
+ * @param {string} [props.createLabel='Ajouter'] Libellé du bouton de création.
+ * @param {() => void} [props.onCreate] Ouvre le flux de création ; masque le bouton s'il est absent.
+ * @param {object[]} props.columns Colonnes Ant Design Table (hors actions).
+ * @param {object[]} props.dataSource Lignes de la page courante.
+ * @param {string} [props.rowKey='id'] Clé de ligne.
+ * @param {boolean} [props.loading=false] Chargement du tableau.
+ * @param {number} [props.page=0] Index de page 0-based (comme l'API).
+ * @param {number} [props.pageSize=10] Taille de page.
+ * @param {number} [props.totalElements=0] Total backend pour la pagination.
+ * @param {(page: number, pageSize: number) => void} props.onPageChange Changement de page / taille.
+ * @param {object} [props.actionColumn] Colonne Actions (modifier / supprimer).
+ * @param {import('react').ReactNode} [props.extraToolbar] Éléments supplémentaires à gauche du bouton Ajouter.
  */
 function AdminPageLayout({
   title,

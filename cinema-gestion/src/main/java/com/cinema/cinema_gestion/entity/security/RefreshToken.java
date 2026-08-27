@@ -10,17 +10,25 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Column;
 
+/**
+ * Entité représentant un jeton de rafraîchissement JWT.
+ * Relation un-à-un avec {@link User} : un utilisateur ne possède qu'un jeton actif à la fois.
+ */
 @Entity
 public class RefreshToken {
+    /** Identifiant technique. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /** Valeur opaque du jeton, unique. */
     @Column(nullable = false, unique = true)
     private String token;
+    /** Date d'expiration du jeton. */
     @Column(nullable = false)
     private LocalDateTime expiryDate;
 
+    /** Utilisateur propriétaire du jeton. */
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;

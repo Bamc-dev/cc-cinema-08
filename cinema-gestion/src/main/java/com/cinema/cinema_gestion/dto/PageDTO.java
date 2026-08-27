@@ -2,11 +2,21 @@ package com.cinema.cinema_gestion.dto;
 
 import java.util.List;
 
+/**
+ * Enveloppe de pagination pour les listes renvoyées par l'API.
+ *
+ * @param <T> type des éléments de la page
+ */
 public class PageDTO<T> {
+    /** Éléments de la page courante. */
     private List<T> content;
+    /** Nombre total d'éléments, toutes pages confondues. */
     private Long totalElements;
+    /** Nombre total de pages. */
     private Integer totalPages;
+    /** Taille de page demandée. */
     private Integer pageSize;
+    /** Indique si le résultat est trié. */
     private Boolean sorted;
 
 

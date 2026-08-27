@@ -6,13 +6,21 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
+/**
+ * Entité représentant un utilisateur authentifiable.
+ * Identifié par un e-mail unique ; le mot de passe est stocké hashé.
+ * Un utilisateur peut être lié à un {@link RefreshToken} et un {@link PasswordResetToken}.
+ */
 @Entity
 @Table(name = "users")
 public class User extends BaseEntity {
+    /** Adresse e-mail unique, utilisée comme identifiant de connexion. */
     @Column(nullable = false, unique = true)
     private String email;
+    /** Mot de passe hashé. */
     @Column(nullable = false)
     private String password;
+    /** Rôle applicatif (valeur par défaut {@code USER}). */
     @Column(nullable = false)
     private String role = "USER";
 

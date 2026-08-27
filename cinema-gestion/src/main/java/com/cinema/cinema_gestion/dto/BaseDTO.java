@@ -2,9 +2,16 @@ package com.cinema.cinema_gestion.dto;
 
 import java.time.LocalDateTime;
 
+/**
+ * Superclasse des DTO administratifs.
+ * Porte l'identifiant et les horodatages d'audit transmis par l'API.
+ */
 public abstract class BaseDTO {
+    /** Identifiant de la ressource, {@code null} à la création. */
     private Long id;
+    /** Date et heure de création. */
     private LocalDateTime createdAt;
+    /** Date et heure de la dernière mise à jour. */
     private LocalDateTime updatedAt;
 
     protected BaseDTO() {

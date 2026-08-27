@@ -11,11 +11,19 @@ import com.cinema.cinema_gestion.enumerator.MovieGenre;
 
 import java.util.HashSet;
 
+/**
+ * Entité représentant un film au catalogue.
+ * Un film peut être projeté via plusieurs séances {@link MovieShow}.
+ */
 @Entity
 public class Movie extends BaseEntity{
+    /** Titre du film. */
     private String title;
+    /** Date de sortie. */
     private LocalDate releaseDate;
+    /** Genre cinématographique. */
     private MovieGenre genre;
+    /** Séances associées à ce film (cascade et suppression des orphelins). */
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MovieShow> movieShows = new HashSet<>();
     public String getTitle() {

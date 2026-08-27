@@ -48,6 +48,10 @@ function isSameCinema(selectedCinema, cinemaId) {
   return selectedCinema && String(selectedCinema.id) === String(cinemaId)
 }
 
+/**
+ * Programmation du jour d'un cinéma (films et horaires).
+ * Exige un cinéma sélectionné (via CinemaCard) correspondant à l'id d'URL.
+ */
 function CinemaProgramPage() {
   const { cinemaId } = useParams()
   const navigate = useNavigate()

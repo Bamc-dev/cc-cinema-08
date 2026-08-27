@@ -5,6 +5,10 @@ const SelectedCinemaContext = createContext(null)
 
 const CINEMA_PROGRAM_PATH = /^\/cinemas\/[^/]+$/
 
+/**
+ * Mémorise le cinéma choisi pour la page programmation, et le vide à la sortie de /cinemas/:id.
+ * @param {{ children: import('react').ReactNode }} props
+ */
 export function SelectedCinemaProvider({ children }) {
   const location = useLocation()
   const previousPathRef = useRef(location.pathname)
@@ -50,6 +54,10 @@ export function SelectedCinemaProvider({ children }) {
   )
 }
 
+/**
+ * Accède au cinéma actuellement sélectionné (programmation publique).
+ * @returns {{ selectedCinema: object|null, selectCinema: Function, clearSelectedCinema: Function }}
+ */
 export function useSelectedCinema() {
   const context = useContext(SelectedCinemaContext)
 

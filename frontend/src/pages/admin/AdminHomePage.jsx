@@ -48,6 +48,9 @@ const ADMIN_SECTIONS = [
   },
 ]
 
+/**
+ * Hub de l'espace admin : raccourcis vers cinémas, salles, films, séances et horaires.
+ */
 function AdminHomePage() {
   return (
     <>

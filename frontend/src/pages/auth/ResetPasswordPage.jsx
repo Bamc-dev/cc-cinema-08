@@ -29,6 +29,9 @@ function mapResetError(error) {
   return error.message || 'Impossible de mettre à jour le mot de passe.'
 }
 
+/**
+ * Définit un nouveau mot de passe à partir du jeton reçu dans l'URL (?token=).
+ */
 function ResetPasswordPage() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()

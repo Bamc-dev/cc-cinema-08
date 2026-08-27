@@ -5,6 +5,18 @@ import { Table } from 'antd'
  * { content, totalElements, totalPages, pageSize }
  *
  * page : index 0-based (comme GET /list/{page}/{size})
+ * @param {object} props
+ * @param {object[]} props.columns Colonnes Ant Design (hors actions).
+ * @param {object[]} [props.dataSource=[]] Lignes affichées.
+ * @param {string} [props.rowKey='id'] Clé de ligne.
+ * @param {boolean} [props.loading=false] Indicateur de chargement.
+ * @param {number} [props.page=0] Index de page 0-based (converti en current 1-based pour Ant Design).
+ * @param {number} [props.pageSize=10] Taille de page.
+ * @param {number} [props.totalElements=0] Total d'éléments (pagination).
+ * @param {(page: number, pageSize: number) => void} [props.onPageChange] Reçoit un index 0-based.
+ * @param {object} [props.actionColumn] Colonne ajoutée à droite (actions).
+ * @param {object} [props.scroll] Option scroll du Table.
+ * @param {string} [props.size='middle'] Densité du tableau.
  */
 function AdminTable({
   columns,

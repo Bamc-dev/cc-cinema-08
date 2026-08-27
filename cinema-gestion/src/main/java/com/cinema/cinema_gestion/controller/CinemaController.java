@@ -7,6 +7,10 @@ import com.cinema.cinema_gestion.service.CinemaService;
 import com.cinema.cinema_gestion.dto.cinema.CinemaDTOCRUD;
 import com.cinema.cinema_gestion.dto.cinema.CinemaDTOView;
 
+/**
+ * CRUD REST des cinémas ({@code /api/cinema}).
+ * Hérite des verbes génériques find/list/create/update/delete.
+ */
 @RestController
 @RequestMapping("/api/cinema")
 public class CinemaController extends GenericCRUDController<CinemaDTOCRUD, CinemaDTOView, CinemaService> {

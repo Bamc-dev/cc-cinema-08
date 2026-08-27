@@ -23,6 +23,9 @@ const EMPTY_FORM = {
   cinemaId: null,
 }
 
+/**
+ * CRUD admin des salles de projection (capacité, date de construction, cinéma parent).
+ */
 function AdminRoomsPage() {
   const [rows, setRows] = useState([])
   const [cinemas, setCinemas] = useState([])

@@ -5,6 +5,9 @@ import java.time.LocalDate;
 import com.cinema.cinema_gestion.dto.BaseDTO;
 import java.util.Set;
 
+/**
+ * DTO CRUD d'une salle : payload d'entrée/sortie pour créer ou modifier une salle.
+ */
 public class RoomDTOCRUD extends BaseDTO {
 
     public RoomDTOCRUD() {
@@ -18,9 +21,13 @@ public class RoomDTOCRUD extends BaseDTO {
         this.cinemaId = cinemaId;
     }
 
+    /** Nombre de places assises. */
     private Integer capacity;
+    /** Date de construction. */
     private LocalDate constructionDate;
+    /** Identifiant du cinéma propriétaire. */
     private Long cinemaId;
+    /** Identifiants des séances programmées dans cette salle. */
     private Set<Long> movieShowIds;
 
     public Integer getCapacity() {

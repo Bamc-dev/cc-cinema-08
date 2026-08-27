@@ -14,6 +14,10 @@ import com.cinema.cinema_gestion.entity.MovieShow;
 import com.cinema.cinema_gestion.entity.Room;
 import com.cinema.cinema_gestion.entity.Schedule;
 
+/**
+ * Mapping MapStruct entre {@link MovieShow}, DTO d'écriture et vue.
+ * Film, salle et horaires sont représentés par leurs identifiants.
+ */
 @Mapper(componentModel = "spring")
 public interface MovieShowMapper extends GenericMapper<MovieShow, MovieShowDTOCRUD, MovieShowDTOView> {
 
@@ -29,6 +33,12 @@ public interface MovieShowMapper extends GenericMapper<MovieShow, MovieShowDTOCR
     @Mapping(target = "schedules", expression = "java(mapScheduleIdsToSchedules(dto.getScheduleIds()))")
     MovieShow toEntity(MovieShowDTOCRUD dto);
 
+    /**
+     * Rétablit le côté propriétaire de l'association séance → horaires après {@link #toEntity}.
+     *
+     * @param dto       DTO d'écriture
+     * @param movieShow séance cible du mapping
+     */
     @AfterMapping
     default void linkSchedulesOwningSide(MovieShowDTOCRUD dto, @MappingTarget MovieShow movieShow) {
         if (movieShow.getSchedules() == null) {
@@ -48,6 +58,12 @@ public interface MovieShowMapper extends GenericMapper<MovieShow, MovieShowDTOCR
     @Override
     MovieShowDTOView toView(MovieShowDTOCRUD dto);
 
+    /**
+     * Reconstruit une référence {@link Movie} à partir de son identifiant.
+     *
+     * @param movieId identifiant du film (peut être null)
+     * @return film id-only, ou {@code null}
+     */
     default Movie mapMovieIdToMovie(Long movieId) {
         if (movieId == null) {
             return null;
@@ -57,6 +73,12 @@ public interface MovieShowMapper extends GenericMapper<MovieShow, MovieShowDTOCR
         return movie;
     }
 
+    /**
+     * Reconstruit une référence {@link Room} à partir de son identifiant.
+     *
+     * @param roomId identifiant de la salle (peut être null)
+     * @return salle id-only, ou {@code null}
+     */
     default Room mapRoomIdToRoom(Long roomId) {
         if (roomId == null) {
             return null;
@@ -66,6 +88,12 @@ public interface MovieShowMapper extends GenericMapper<MovieShow, MovieShowDTOCR
         return room;
     }
 
+    /**
+     * Reconstruit des références {@link Schedule} à partir d'identifiants.
+     *
+     * @param ids identifiants d'horaires (peut être null)
+     * @return horaires id-only
+     */
     default Set<Schedule> mapScheduleIdsToSchedules(Set<Long> ids) {
         return idsToEntities(ids, Schedule::new);
     }

@@ -24,6 +24,9 @@ function mapForgotError(error) {
   return error.message || 'Impossible d’envoyer le lien pour le moment.'
 }
 
+/**
+ * Demande d'un lien de réinitialisation de mot de passe par email.
+ */
 function ForgotPasswordPage() {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)

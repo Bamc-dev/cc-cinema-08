@@ -28,6 +28,9 @@ import com.cinema.cinema_gestion.repository.ScheduleRepository;
 
 import jakarta.persistence.criteria.Predicate;
 
+/**
+ * Catalogue public : recherche de cinémas et de films, programme du jour, horaires.
+ */
 @Service
 public class PublicService {
 
@@ -35,6 +38,11 @@ public class PublicService {
     private final MovieRepository movieRepository;
     private final ScheduleRepository scheduleRepository;
 
+    /**
+     * @param cinemaRepository   cinémas
+     * @param movieRepository    films
+     * @param scheduleRepository horaires (requêtes catalogue)
+     */
     public PublicService(CinemaRepository cinemaRepository, MovieRepository movieRepository,
             ScheduleRepository scheduleRepository) {
         this.cinemaRepository = cinemaRepository;
@@ -42,6 +50,12 @@ public class PublicService {
         this.scheduleRepository = scheduleRepository;
     }
 
+    /**
+     * Liste les cinémas, filtrable par nom ou ville (insensible à la casse).
+     *
+     * @param query texte libre, optionnel
+     * @return vues publiques
+     */
     public List<CinemaPublicView> findCinemas(String query) {
         List<Cinema> cinemas;
         if (query == null || query.isBlank()) {
@@ -58,6 +72,12 @@ public class PublicService {
                 .toList();
     }
 
+    /**
+     * Liste les films, filtrable par titre ou nom de genre.
+     *
+     * @param query texte libre, optionnel
+     * @return vues publiques
+     */
     public List<MoviePublicView> findMovies(String query) {
         List<Movie> movies;
         if (query == null || query.isBlank()) {
@@ -82,6 +102,12 @@ public class PublicService {
                 .toList();
     }
 
+    /**
+     * Films programmés aujourd'hui dans un cinéma, avec leurs séances.
+     *
+     * @param cinemaId identifiant du cinéma
+     * @return films du jour
+     */
     public List<MovieTodayView> findCinemaToday(Long cinemaId) {
         LocalDate today = LocalDate.now();
         LocalDateTime startOfDay = today.atStartOfDay();
@@ -102,6 +128,14 @@ public class PublicService {
         return grouped.values().stream().map(MovieTodayViewBuilder::build).toList();
     }
 
+    /**
+     * Horaires d'un film, optionnellement filtrés par date et par nom/ville de cinéma.
+     *
+     * @param movieId identifiant du film
+     * @param date    jour, optionnel
+     * @param query   filtre cinéma, optionnel
+     * @return horaires publics
+     */
     public List<MovieShowtimePublicView> findMovieShowtimes(Long movieId, LocalDate date, String query) {
         LocalDateTime startOfDay = null;
         LocalDateTime endOfDay = null;

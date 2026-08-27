@@ -9,6 +9,10 @@ import org.mapstruct.Mapping;
 import java.util.Set;
 import com.cinema.cinema_gestion.entity.Room;
 
+/**
+ * Mapping MapStruct entre {@link Cinema}, DTO d'écriture et vue.
+ * Les salles sont représentées par leurs identifiants.
+ */
 @Mapper(componentModel = "spring")
 public interface CinemaMapper extends GenericMapper<Cinema, CinemaDTOCRUD, CinemaDTOView> {
 
@@ -26,6 +30,12 @@ public interface CinemaMapper extends GenericMapper<Cinema, CinemaDTOCRUD, Cinem
     @Override
     CinemaDTOView toView(CinemaDTOCRUD dto);
 
+    /**
+     * Reconstruit des références {@link Room} à partir d'identifiants.
+     *
+     * @param ids identifiants de salles (peut être null)
+     * @return salles id-only
+     */
     default Set<Room> mapRoomIdsToRooms(Set<Long> ids) {
         return idsToEntities(ids, Room::new);
     }

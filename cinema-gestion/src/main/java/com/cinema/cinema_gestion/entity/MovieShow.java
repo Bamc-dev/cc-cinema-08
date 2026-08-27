@@ -8,15 +8,23 @@ import jakarta.persistence.CascadeType;
 import java.util.Set;
 import java.util.HashSet;
 
+/**
+ * Entité représentant une séance (programmation d'un film dans une salle).
+ * Relie un {@link Movie} à une {@link Room} et possède des horaires {@link Schedule}.
+ */
 @Entity
 public class MovieShow extends BaseEntity {
 
+    /** Prix du billet pour cette séance. */
     private Double price;
+    /** Film projeté. */
     @ManyToOne
     @JoinColumn(name = "movie_id")
     private Movie movie;
+    /** Créneaux horaires de la séance (cascade et suppression des orphelins). */
     @OneToMany(mappedBy = "movieShow", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Schedule> schedules = new HashSet<>();
+    /** Salle de projection. */
     @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;

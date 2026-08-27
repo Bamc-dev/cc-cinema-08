@@ -5,6 +5,10 @@ const SelectedMovieContext = createContext(null)
 
 const MOVIE_SHOWTIMES_PATH = /^\/films\/[^/]+$/
 
+/**
+ * Mémorise le film choisi pour la page séances, et le vide à la sortie de /films/:id.
+ * @param {{ children: import('react').ReactNode }} props
+ */
 export function SelectedMovieProvider({ children }) {
   const location = useLocation()
   const previousPathRef = useRef(location.pathname)
@@ -51,6 +55,10 @@ export function SelectedMovieProvider({ children }) {
   )
 }
 
+/**
+ * Accède au film actuellement sélectionné (séances publiques).
+ * @returns {{ selectedMovie: object|null, selectMovie: Function, clearSelectedMovie: Function }}
+ */
 export function useSelectedMovie() {
   const context = useContext(SelectedMovieContext)
 

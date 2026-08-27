@@ -9,6 +9,9 @@ import App from './App.jsx'
 
 dayjs.locale('fr')
 
+/**
+ * Monte l'application React : locale française, thème sombre Ant Design, et racine #root.
+ */
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ConfigProvider

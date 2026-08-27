@@ -10,6 +10,9 @@ const { Search } = Input
 
 const SEARCH_DEBOUNCE_MS = 300
 
+/**
+ * Liste publique des cinémas, avec recherche par nom ou ville.
+ */
 function CinemasPage() {
   const [cinemas, setCinemas] = useState([])
   const [loading, setLoading] = useState(true)

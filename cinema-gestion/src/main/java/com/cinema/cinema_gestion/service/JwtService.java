@@ -15,12 +15,20 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
 import com.cinema.cinema_gestion.entity.security.User;
 
+/**
+ * Émission et validation des JWT d'accès (sujet = identifiant utilisateur).
+ */
 @Service
 public class JwtService {
     private final String secret;
     private final long accessExpirationMs;
     private final long refreshExpirationMs;
 
+    /**
+     * @param secret              secret HMAC (Base64 ou brut)
+     * @param accessExpirationMs  durée de vie de l'access token
+     * @param refreshExpirationMs durée de vie du refresh token (exposé aux autres services)
+     */
     public JwtService(
             @Value("${security.jwt.secret}") String secret,
             @Value("${security.jwt.access-expiration-ms}") long accessExpirationMs,
@@ -30,6 +38,10 @@ public class JwtService {
         this.refreshExpirationMs = refreshExpirationMs;
     }
 
+    /**
+     * @param user utilisateur authentifié
+     * @return JWT d'accès signé
+     */
     public String generateAccessToken(User user) {
         return Jwts.builder()
                 .subject(user.getId().toString())
@@ -39,10 +51,18 @@ public class JwtService {
                 .compact();
     }
 
+    /**
+     * @param token JWT
+     * @return sujet (id utilisateur) ou lève si le token est invalide
+     */
     public String extractSubject(String token) {
         return extractAllClaims(token).getSubject();
     }
 
+    /**
+     * @param token JWT
+     * @return {@code true} si signature et expiration sont valides
+     */
     public boolean isTokenValid(String token) {
         try {
             extractAllClaims(token);
@@ -52,6 +72,9 @@ public class JwtService {
         }
     }
 
+    /**
+     * @return durée de vie du refresh token en millisecondes
+     */
     public long getRefreshExpirationMs() {
         return refreshExpirationMs;
     }

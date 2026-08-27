@@ -20,6 +20,9 @@ import HomePage from './pages/public/HomePage'
 import MoviesPage from './pages/public/MoviesPage'
 import MovieShowtimesPage from './pages/public/MovieShowtimesPage'
 
+/**
+ * Point d'entrée React : providers (auth, cinéma/film sélectionnés) et routes publiques / auth / admin.
+ */
 function App() {
   return (
     <BrowserRouter>

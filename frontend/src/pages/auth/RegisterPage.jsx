@@ -7,6 +7,9 @@ import { ApiError } from '../../api/client'
 
 const { Title, Paragraph } = Typography
 
+/**
+ * Création de compte : inscription puis connexion automatique vers /admin.
+ */
 function RegisterPage() {
   const { login, isAuthenticated } = useAuth()
   const navigate = useNavigate()

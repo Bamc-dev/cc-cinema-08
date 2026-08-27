@@ -19,6 +19,9 @@ import com.cinema.cinema_gestion.entity.security.User;
 import com.cinema.cinema_gestion.repository.PasswordResetTokenRepository;
 import com.cinema.cinema_gestion.repository.UserRepository;
 
+/**
+ * Demande et application d'une réinitialisation de mot de passe par e-mail.
+ */
 @Service
 public class PasswordResetService {
     private final UserRepository userRepository;
@@ -28,6 +31,14 @@ public class PasswordResetService {
     private final MailService mailService;
     private final long resetExpirationMs;
 
+    /**
+     * @param userRepository                 comptes
+     * @param passwordResetTokenRepository   tokens de reset
+     * @param refreshTokenService            révocation des sessions après reset
+     * @param passwordEncoder                hachage du nouveau mot de passe
+     * @param mailService                    envoi de l'e-mail
+     * @param resetExpirationMs              durée de vie du token
+     */
     public PasswordResetService(
             UserRepository userRepository,
             PasswordResetTokenRepository passwordResetTokenRepository,
@@ -43,6 +54,12 @@ public class PasswordResetService {
         this.resetExpirationMs = resetExpirationMs;
     }
 
+    /**
+     * Génère un token, l'associe à l'utilisateur et envoie le lien de reset.
+     *
+     * @param request e-mail du compte
+     * @return message de confirmation et date d'expiration
+     */
     @Transactional
     public ForgotPasswordResponse forgotPassword(ForgotPasswordRequest request) {
         String email = request.email() == null ? "" : request.email().trim();
@@ -65,6 +82,11 @@ public class PasswordResetService {
         return new ForgotPasswordResponse("A password reset email has been sent.", expiresAt);
     }
 
+    /**
+     * Applique le nouveau mot de passe, consomme le token et révoque les refresh tokens.
+     *
+     * @param request token et nouveau mot de passe
+     */
     @Transactional
     public void resetPassword(ResetPasswordRequest request) {
         String token = request.token() == null ? "" : request.token().trim();

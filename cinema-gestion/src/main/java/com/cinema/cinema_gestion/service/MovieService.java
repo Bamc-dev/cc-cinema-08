@@ -14,13 +14,26 @@ import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service métier des films : CRUD générique et recherche par titre ou genre.
+ */
 @Service
 public class MovieService extends GenericService<Movie, MovieDTOCRUD, MovieDTOView, MovieMapper, MovieRepository> {
 
+    /**
+     * @param repository repository des films
+     * @param mapper     mapper film
+     */
     public MovieService(MovieRepository repository, MovieMapper mapper) {
         super(repository, mapper);
     }
 
+    /**
+     * Filtre sur le titre (LIKE) et, si {@code search} correspond à un {@link MovieGenre}, sur le genre.
+     *
+     * @param search texte déjà trimé
+     * @return spécification JPA
+     */
     @Override
     protected Specification<Movie> buildSearchSpecification(String search) {
         String pattern = likePattern(search);

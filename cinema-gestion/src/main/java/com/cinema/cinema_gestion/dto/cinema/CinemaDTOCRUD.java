@@ -3,13 +3,21 @@ package com.cinema.cinema_gestion.dto.cinema;
 import com.cinema.cinema_gestion.dto.BaseDTO;
 import java.util.Set;
 
+/**
+ * DTO CRUD d'un cinéma : payload d'entrée/sortie pour créer ou modifier un établissement.
+ */
 public class CinemaDTOCRUD extends BaseDTO {
     
+    /** Nom commercial du cinéma. */
     private String name;
+    /** Ville d'implantation. */
     private String city;
+    /** Rue de l'adresse. */
     private String street;
+    /** Numéro de voie. */
     private String number;
 
+    /** Identifiants des salles rattachées. */
     private Set<Long> roomIds;
 
     public CinemaDTOCRUD() {

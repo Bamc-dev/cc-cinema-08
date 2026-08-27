@@ -45,16 +45,6 @@ npm run dev
 - URL : [http://localhost:5173](http://localhost:5173)
 - En développement, Vite proxy `/api` et `/auth` vers `http://localhost:5151` (`VITE_API_URL` vide). Voir [frontend/README.md](frontend/README.md).
 
-## Modèle métier
-
-```mermaid
-flowchart LR
-  Cinema --> Room
-  Room --> MovieShow
-  Movie --> MovieShow
-  MovieShow --> Schedule
-```
-
 - **Cinema** : nom, ville, rue, numéro ; possède des salles
 - **Room** : capacité, date de construction ; appartient à un cinéma
 - **Movie** : titre, date de sortie, genre

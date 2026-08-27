@@ -50,7 +50,9 @@ class RefreshTokenServiceTest {
         verify(refreshTokenRepository).save(captor.capture());
         RefreshToken saved = captor.getValue();
         assertThat(saved.getUser()).isEqualTo(user);
-        assertThat(saved.getExpiryDate()).isAfter(LocalDateTime.now());
+        assertThat(saved.getExpiryDate())
+                .isAfter(LocalDateTime.now().plusDays(6))
+                .isBefore(LocalDateTime.now().plusDays(8));
     }
 
     @Test
@@ -65,6 +67,9 @@ class RefreshTokenServiceTest {
         String token = refreshTokenService.createOrRotate(user);
 
         assertThat(token).isNotBlank().isNotEqualTo("old-token");
+        assertThat(existing.getExpiryDate())
+                .isAfter(LocalDateTime.now().plusDays(6))
+                .isBefore(LocalDateTime.now().plusDays(8));
         verify(refreshTokenRepository).save(existing);
     }
 

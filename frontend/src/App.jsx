@@ -22,36 +22,36 @@ import MovieShowtimesPage from './pages/public/MovieShowtimesPage'
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <AuthProvider>
         <SelectedCinemaProvider>
           <SelectedMovieProvider>
             <Routes>
-            <Route element={<AppLayout />}>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/cinemas" element={<CinemasPage />} />
-              <Route path="/cinemas/:cinemaId" element={<CinemaProgramPage />} />
-              <Route path="/films" element={<MoviesPage />} />
-              <Route path="/films/:movieId" element={<MovieShowtimesPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route element={<AppLayout />}>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/cinemas" element={<CinemasPage />} />
+                <Route path="/cinemas/:cinemaId" element={<CinemaProgramPage />} />
+                <Route path="/films" element={<MoviesPage />} />
+                <Route path="/films/:movieId" element={<MovieShowtimesPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-              <Route element={<ProtectedRoute />}>
-                <Route path="/admin" element={<AdminHomePage />} />
-                <Route path="/admin/cinemas" element={<AdminCinemasPage />} />
-                <Route path="/admin/rooms" element={<AdminRoomsPage />} />
-                <Route path="/admin/movies" element={<AdminMoviesPage />} />
-                <Route path="/admin/movie-shows" element={<AdminMovieShowsPage />} />
-                <Route path="/admin/schedules" element={<AdminSchedulesPage />} />
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/admin" element={<AdminHomePage />} />
+                  <Route path="/admin/cinemas" element={<AdminCinemasPage />} />
+                  <Route path="/admin/rooms" element={<AdminRoomsPage />} />
+                  <Route path="/admin/movies" element={<AdminMoviesPage />} />
+                  <Route path="/admin/movie-shows" element={<AdminMovieShowsPage />} />
+                  <Route path="/admin/schedules" element={<AdminSchedulesPage />} />
+                </Route>
               </Route>
-            </Route>
             </Routes>
           </SelectedMovieProvider>
         </SelectedCinemaProvider>
-      </BrowserRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </BrowserRouter>
   )
 }
 

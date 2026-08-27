@@ -1,6 +1,7 @@
 package com.cinema.cinema_gestion.service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import org.springframework.security.authentication.BadCredentialsException;
@@ -26,13 +27,9 @@ public class RefreshTokenService {
     @Transactional
     public String createOrRotate(User user) {
         RefreshToken refreshToken = refreshTokenRepository.findByUser(user).orElseGet(RefreshToken::new);
-        if (refreshToken.getExpiryDate() != null) {
-            refreshToken.setToken(UUID.randomUUID().toString());
-        } else {
-            refreshToken.setUser(user);
-            refreshToken.setToken(UUID.randomUUID().toString());
-            refreshToken.setExpiryDate(LocalDateTime.now().plusNanos(refreshExpirationMs));
-        }
+        refreshToken.setUser(user);
+        refreshToken.setToken(UUID.randomUUID().toString());
+        refreshToken.setExpiryDate(LocalDateTime.now().plus(refreshExpirationMs, ChronoUnit.MILLIS));
         refreshTokenRepository.save(refreshToken);
         return refreshToken.getToken();
     }

@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { logout as logoutRequest, refresh as refreshRequest } from '../api/auth'
 import { clearAuthHandlers, setAuthHandlers } from '../api/authHandlers'
 import {
@@ -11,6 +12,7 @@ import {
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
+  const navigate = useNavigate()
   const [accessToken, setAccessToken] = useState(getAccessToken)
   const [refreshToken, setRefreshToken] = useState(getRefreshToken)
 
@@ -58,16 +60,29 @@ export function AuthProvider({ children }) {
     }
   }, [login])
 
+  const redirectToLogin = useCallback(() => {
+    const pathname = window.location.pathname
+    if (pathname === '/login') {
+      return
+    }
+
+    navigate('/login', {
+      replace: true,
+      state: { from: { pathname } },
+    })
+  }, [navigate])
+
   useEffect(() => {
     setAuthHandlers({
       refresh: refreshSession,
       logout,
+      redirectToLogin,
     })
 
     return () => {
       clearAuthHandlers()
     }
-  }, [refreshSession, logout])
+  }, [refreshSession, logout, redirectToLogin])
 
   const value = useMemo(
     () => ({

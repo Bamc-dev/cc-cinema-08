@@ -1,5 +1,11 @@
 import { getAccessToken } from '../auth/authStorage'
-import { shouldAttemptRefresh, triggerLogout, tryRefreshTokens } from './authHandlers'
+import {
+  isAuthFailureStatus,
+  redirectToLogin,
+  shouldAttemptRefresh,
+  triggerLogout,
+  tryRefreshTokens,
+} from './authHandlers'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? ''
 
@@ -54,7 +60,12 @@ export async function apiFetch(path, options = {}) {
     body: body !== undefined ? JSON.stringify(body) : undefined,
   })
 
-  if (response.status === 401 && !isRetry && shouldAttemptRefresh(path) && accessToken) {
+  if (
+    isAuthFailureStatus(response.status) &&
+    !isRetry &&
+    shouldAttemptRefresh(path) &&
+    accessToken
+  ) {
     const refreshed = await tryRefreshTokens()
 
     if (refreshed) {
@@ -62,6 +73,8 @@ export async function apiFetch(path, options = {}) {
     }
 
     await triggerLogout()
+    redirectToLogin()
+    throw new ApiError(response.status, 'Session expirée. Veuillez vous reconnecter.')
   }
 
   return parseResponse(response)

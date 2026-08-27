@@ -1,15 +1,18 @@
 let refreshHandler = null
 let logoutHandler = null
+let redirectToLoginHandler = null
 let refreshInFlight = null
 
-export function setAuthHandlers({ refresh, logout }) {
+export function setAuthHandlers({ refresh, logout, redirectToLogin }) {
   refreshHandler = refresh
   logoutHandler = logout
+  redirectToLoginHandler = redirectToLogin
 }
 
 export function clearAuthHandlers() {
   refreshHandler = null
   logoutHandler = null
+  redirectToLoginHandler = null
   refreshInFlight = null
 }
 
@@ -23,6 +26,10 @@ const NO_REFRESH_PATHS = [
 
 export function shouldAttemptRefresh(path) {
   return !NO_REFRESH_PATHS.some((authPath) => path.startsWith(authPath))
+}
+
+export function isAuthFailureStatus(status) {
+  return status === 401 || status === 403
 }
 
 export async function tryRefreshTokens() {
@@ -42,5 +49,11 @@ export async function tryRefreshTokens() {
 export async function triggerLogout() {
   if (logoutHandler) {
     await logoutHandler()
+  }
+}
+
+export function redirectToLogin() {
+  if (redirectToLoginHandler) {
+    redirectToLoginHandler()
   }
 }
